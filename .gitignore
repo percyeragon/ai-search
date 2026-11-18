@@ -3,3 +3,7 @@
 models/hf-cache
 __pycache__
 models/
+.cache/
+results/benchmark/
+# Windows download markers
+*:Zone.Identifier

@@ -254,6 +254,22 @@ train-xgb:
 	$(PYTHON) -m $(TRAIN_XGB_SCRIPT)
 
 # =====================================================
+# LAUFZEITTEST (lokal, in-process, ohne Docker/PostgreSQL)
+# =====================================================
+# Misst Latenz pro Architektur-Stufe (Preprocessing, Filter, Retrieval/Fusion,
+# Cross-Encoder, Ergebnisaufbau) über echte Log-Queries.
+# Ergebnisse: results/benchmark/<timestamp>/
+#
+# Beispiele:
+#   make benchmark
+#   make benchmark N_QUERIES=200 SCENARIOS=bm25,rrf,rrf+ce
+N_QUERIES ?= 100
+benchmark:
+	$(PYTHON) -m src.scripts.benchmark_latency \
+		--n-queries $(N_QUERIES) \
+		$(if $(SCENARIOS),--scenarios $(SCENARIOS),)
+
+# =====================================================
 # CLEAN
 # =====================================================
 clean:

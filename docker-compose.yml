@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: ai-suche-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ai_suche
+      POSTGRES_USER: ai_suche
+      POSTGRES_PASSWORD: ai_suche
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ai_suche -d ai_suche"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ai-suche-postgres:/var/lib/postgresql/data
+
+  ai-suche-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-suche-api:latest
+    container_name: ai-suche-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env.local
+    ports:
+      - "8000:8000"
+    volumes:
+      # Corpus, Qrels etc. — read-only, wird nicht im Image gebacken
+      - ./data:/app/data:ro
+      # XGB-Modell (xgb_fusion.json) und ggf. weitere Artefakte — read-write,
+      # damit /admin/reload bzw. train_xgb_model.py neu geschriebene Modelle sehen kann
+      - ./models:/app/models
+      # Persistenter Cache für Query-Embeddings / Dense-Index, damit er Container-Neustarts übersteht
+      - ai-suche-cache:/app/.cache
+      # Laufzeit-Korpus aus der Interamt-API
+      - ai-suche-runtime-data:/app/runtime-data
+      - ./models/hf-cache:/root/.cache/huggingface:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Genau ein Dienst sollte Master sein; weitere API-Instanzen als Worker starten.
+      - AI_SUCH_ROLE=${AI_SUCH_ROLE:-master}
+      - EMBEDDING_DATABASE_URL=postgresql://ai_suche:ai_suche@postgres:5432/ai_suche
+      - HF_HUB_OFFLINE=1        # neu — verhindert Online-Nachfrage trotz lokalem Cache
+      - TRANSFORMERS_OFFLINE=1  # neu
+    deploy:
+      resources:
+        limits:
+          # Dense-Index (FAISS + bge-m3) und Cross-Encoder-Reranking sind speicherhungrig —
+          # Wert nach Bedarf anpassen
+          memory: 8G
+
+volumes:
+  ai-suche-postgres:
+  ai-suche-cache:
+  ai-suche-runtime-data:

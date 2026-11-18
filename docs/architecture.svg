@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 1600 1040" preserveAspectRatio="xMidYMin meet" role="img" aria-labelledby="title desc">
+  <title id="title">Architektur des Projekts ai-suche</title>
+  <desc id="desc">Architekturdiagramm der FastAPI-Suche mit Query-Preprocessing, BM25, Dense Retrieval, Fusion, optionalem Reranking, PostgreSQL und Interamt-API.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7faf9"/>
+      <stop offset="1" stop-color="#e8f0f3"/>
+    </linearGradient>
+    <linearGradient id="api" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#115e59"/>
+    </linearGradient>
+    <linearGradient id="retrieval" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="rerank" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c2410c"/>
+      <stop offset="1" stop-color="#9a3412"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#12343b" flood-opacity="0.13"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#52666b"/>
+    </marker>
+    <marker id="arrowLight" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c7d9dc"/>
+    </marker>
+    <style>
+      .title { font: 700 34px 'Segoe UI', sans-serif; fill: #12343b; letter-spacing: 0; }
+      .subtitle { font: 400 16px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 0; }
+      .section { font: 700 15px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 1.5px; }
+      .boxTitle { font: 700 19px 'Segoe UI', sans-serif; fill: #12343b; letter-spacing: 0; }
+      .boxText { font: 400 14px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 0; }
+      .whiteTitle { font: 700 18px 'Segoe UI', sans-serif; fill: #ffffff; letter-spacing: 0; }
+      .whiteText { font: 400 13px 'Segoe UI', sans-serif; fill: #d7efed; letter-spacing: 0; }
+      .small { font: 400 12px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 0; }
+      .flow { font: 600 12px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 0; }
+      .line { stroke: #52666b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .dashed { stroke: #82969a; stroke-width: 2; stroke-dasharray: 8 7; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1040" fill="#ffffff"/>
+
+  <text x="80" y="72" class="title">ai-suche · Systemarchitektur</text>
+  <text x="80" y="103" class="subtitle">Semantische Vorauswahl und Suche über Interamt-Stellenausschreibungen</text>
+  <line x1="80" y1="132" x2="1520" y2="132" stroke="#c7d9dc" stroke-width="2"/>
+
+  <text x="80" y="172" class="section">LAUFZEIT · POST /search</text>
+
+  <!-- Client -->
+  <g filter="url(#shadow)">
+    <rect x="80" y="210" width="205" height="120" rx="12" fill="#ffffff" stroke="#c7d9dc" stroke-width="2"/>
+    <rect x="80" y="210" width="205" height="10" rx="5" fill="#12343b"/>
+      <text x="105" y="253" class="boxTitle">Nutzer / Client</text>
+    <text x="105" y="280" class="boxText">Swagger / REST-Anfrage</text>
+    <text x="105" y="304" class="small">POST /search · Treffer · Filter</text>
+  </g>
+
+  <!-- API -->
+  <g filter="url(#shadow)">
+    <rect x="350" y="190" width="275" height="160" rx="12" fill="url(#api)"/>
+    <text x="380" y="235" class="whiteTitle">FastAPI-Dienst</text>
+    <text x="380" y="265" class="whiteText">Anfrageprüfung · Laufzeitstatus</text>
+    <text x="380" y="290" class="whiteText">Vorfilter: Ort, PLZ, Radius</text>
+    <text x="380" y="315" class="whiteText">Neuladen · Health · Status</text>
+  </g>
+  <line x1="285" y1="270" x2="350" y2="270" class="line"/>
+  <text x="317" y="253" text-anchor="middle" class="flow">HTTP</text>
+
+  <!-- Preprocessing -->
+  <g filter="url(#shadow)">
+    <rect x="690" y="190" width="275" height="160" rx="12" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+    <rect x="690" y="190" width="275" height="10" rx="5" fill="#0f766e"/>
+    <text x="720" y="235" class="boxTitle">Anfrage-Aufbereitung</text>
+    <text x="720" y="265" class="boxText">Rechtschreibkorrektur</text>
+    <text x="720" y="287" class="boxText">Abkürzungen erweitern</text>
+    <text x="720" y="309" class="boxText">Schreibvarianten / Komposita</text>
+    <text x="720" y="331" class="boxText">Behördensprache normalisieren</text>
+  </g>
+  <line x1="625" y1="270" x2="690" y2="270" class="line"/>
+
+  <!-- Retrieval -->
+  <g filter="url(#shadow)">
+    <rect x="1030" y="165" width="430" height="210" rx="12" fill="url(#retrieval)"/>
+    <text x="1060" y="210" class="whiteTitle">Suche und Zusammenführung</text>
+    <rect x="1060" y="235" width="170" height="90" rx="8" fill="#ffffff" opacity="0.96"/>
+    <text x="1080" y="265" class="boxTitle">BM25</text>
+    <text x="1080" y="290" class="boxText">Stichwortsuche</text>
+    <text x="1080" y="311" class="boxText">Schlüsselwort-Scores</text>
+    <rect x="1250" y="235" width="170" height="90" rx="8" fill="#ffffff" opacity="0.96"/>
+    <text x="1270" y="265" class="boxTitle">Dense</text>
+    <text x="1270" y="290" class="boxText">bge-m3 + FAISS</text>
+    <text x="1270" y="311" class="boxText">Vektor-Scores</text>
+    <text x="1060" y="354" class="whiteText">RRF · Alpha · XGBoost-LTR</text>
+  </g>
+  <line x1="965" y1="270" x2="1030" y2="270" class="line"/>
+  <text x="997" y="253" text-anchor="middle" class="flow">Suchtext</text>
+
+  <!-- Rerank -->
+  <g filter="url(#shadow)">
+    <rect x="80" y="445" width="435" height="165" rx="12" fill="url(#rerank)"/>
+    <text x="110" y="490" class="whiteTitle">Optionale Nachsortierung</text>
+    <text x="110" y="523" class="whiteText">Wissensgraph · Kompetenzgraph</text>
+    <text x="110" y="545" class="whiteText">Cross-Encoder</text>
+    <text x="110" y="565" class="whiteText">bge-reranker-v2-m3</text>
+    <text x="110" y="592" class="whiteText">Kandidatenpool → Top-k-Ranking</text>
+  </g>
+  <path d="M1245 375 V410 H298 V445" class="line"/>
+
+  <!-- Output -->
+  <g filter="url(#shadow)">
+    <rect x="650" y="445" width="390" height="165" rx="12" fill="#ffffff" stroke="#c7d9dc" stroke-width="2"/>
+    <rect x="650" y="445" width="390" height="10" rx="5" fill="#12343b"/>
+    <text x="680" y="490" class="boxTitle">Ergebnisse</text>
+    <text x="680" y="522" class="boxText">Ranked Documents · Scores</text>
+    <text x="680" y="548" class="boxText">Metadata · Snippet · Details</text>
+    <text x="680" y="579" class="boxText">Sortierung: Relevanz / Aktualität / Distanz</text>
+  </g>
+  <line x1="515" y1="527" x2="650" y2="527" class="line"/>
+  <path d="M650 445 H630 V400 H182 V330" class="line"/>
+
+  <!-- Runtime note -->
+  <rect x="1110" y="455" width="350" height="135" rx="12" fill="#e5f2f1" stroke="#a8d1cc" stroke-width="2"/>
+  <text x="1140" y="492" class="boxTitle">Pipeline-Komponenten</text>
+  <text x="1140" y="520" class="boxText">Scorer + QE + KG + CE</text>
+  <text x="1140" y="546" class="boxText">frei kombinierbar</text>
+  <text x="1140" y="572" class="small">BM25 / Dense / RRF / Alpha / XGB</text>
+  <path d="M1040 527 H1110" class="dashed"/>
+
+  <!-- Data plane -->
+  <text x="80" y="690" class="section">DATEN &amp; BETRIEB · STARTUP / POST /admin/reload</text>
+  <g filter="url(#shadow)">
+    <rect x="80" y="730" width="270" height="170" rx="12" fill="#ffffff" stroke="#c7d9dc" stroke-width="2"/>
+    <text x="110" y="775" class="boxTitle">Interamt API</text>
+    <text x="110" y="805" class="boxText">Korpus-Abruf</text>
+    <text x="110" y="831" class="boxText">Stellenausschreibungen</text>
+    <text x="110" y="866" class="small">Master-only Schreibzugriff</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="470" y="730" width="270" height="170" rx="12" fill="#ffffff" stroke="#c7d9dc" stroke-width="2"/>
+    <text x="500" y="775" class="boxTitle">Laufzeit-Korpus</text>
+    <text x="500" y="805" class="boxText">corpus.jsonl</text>
+    <text x="500" y="831" class="boxText">strukturierte Metadaten</text>
+    <text x="500" y="866" class="small">Filterbasis und Ergebnisdetails</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="860" y="710" width="300" height="210" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <rect x="860" y="710" width="300" height="10" rx="5" fill="#2563eb"/>
+    <text x="890" y="755" class="boxTitle">PostgreSQL + pgvector</text>
+    <text x="890" y="788" class="boxText">Embedding-Speicher</text>
+    <text x="890" y="814" class="boxText">inkrementeller Embedding-Cache</text>
+    <text x="890" y="840" class="boxText">nur neue/geänderte Dokumente</text>
+    <text x="890" y="880" class="small">Master schreibt · Worker lesen</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="1220" y="710" width="300" height="210" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <rect x="1220" y="710" width="300" height="10" rx="5" fill="#2563eb"/>
+    <text x="1250" y="755" class="boxTitle">Modelle und Indizes</text>
+    <text x="1250" y="790" class="boxText">bge-m3</text>
+    <text x="1250" y="816" class="boxText">FAISS IndexFlatIP</text>
+    <text x="1250" y="842" class="boxText">XGBoost-Modell</text>
+    <text x="1250" y="868" class="boxText">Cross-Encoder / KG Cache</text>
+  </g>
+
+  <path d="M350 815 H470" class="line"/>
+  <path d="M740 815 H860" class="line"/>
+  <path d="M1160 815 H1220" class="line"/>
+  <path d="M995 710 V610" class="dashed"/>
+  <path d="M1385 710 V640 H1460 V375" class="dashed"/>
+
+  <!-- Deployment -->
+  <rect x="80" y="955" width="1440" height="44" rx="8" fill="#12343b"/>
+  <text x="110" y="983" class="whiteText">Betrieb mit Docker Compose</text>
+  <text x="390" y="983" class="whiteText">PostgreSQL/pgvector</text>
+  <text x="635" y="983" class="whiteText">ai-suche-api</text>
+  <text x="815" y="983" class="whiteText">Master + optionale Worker</text>
+  <text x="1190" y="983" class="whiteText">Port 8000</text>
+</svg>

@@ -1,0 +1,201 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+        "StackTraceElement": {
+            "type": "object",
+            "properties": {
+                "classLoaderName": {"type": "string"},
+                "declaringClass": {"type": "string"},
+                "fileName": {"type": "string"},
+                "format": {"type": "string"},
+                "lineNumber": {"type": "integer"},
+                "methodName": {"type": "string"},
+                "moduleName": {"type": "string"},
+                "moduleVersion": {"type": "string"}
+            }
+        },
+        "Throwable": {
+            "type": "object",
+            "properties": {
+                "cause": {"$ref": "#/$defs/Throwable"},
+                "detailMessage": {"type": "string"},
+                "stackTrace": {
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/StackTraceElement"}
+                },
+                "suppressedExceptions": {
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/Throwable"}
+                }
+            }
+        },
+        "DienstverhaeltnisAusbildung": {
+            "type": "object",
+            "properties": {
+                "ausbildungsdauer": {"type": "number"},
+                "type": {
+                    "type": "string",
+                    "description": "Gibt den Objecttyp an",
+                    "default": "AUSBILDUNG"
+                }
+            }
+        },
+        "DienstverhaeltnisAngestellter": {
+            "type": "object",
+            "properties": {
+                "wochenarbeitszeit": {"type": "number"},
+                "tarif": {"type": "string"},
+                "entgeldgruppeVon": {"type": "string"},
+                "entgeldgruppeBis": {"type": "string"},
+                "type": {
+                    "type": "string",
+                    "description": "Gibt den Objecttyp an",
+                    "default": "ANGESTELLTER"
+                }
+            }
+        },
+        "DienstverhaeltnisBeamter": {
+            "type": "object",
+            "properties": {
+                "wochenarbeitszeit": {"type": "number"},
+                "laufbahngruppe": {"type": "string"},
+                "besoldungVon": {"type": "string"},
+                "besoldungBis": {"type": "string"},
+                "type": {
+                    "type": "string",
+                    "description": "Gibt den Objecttyp an",
+                    "default": "BEAMTER"
+                }
+            }
+        },
+        "DienstverhaeltnisDualesStudium": {
+            "type": "object",
+            "properties": {
+                "ausbildungsdauer": {"type": "number"},
+                "type": {
+                    "type": "string",
+                    "description": "Gibt den Objecttyp an",
+                    "default": "DUALES_STUDIUM"
+                }
+            }
+        },
+        "DienstverhaeltnisPraktikum": {
+            "type": "object",
+            "properties": {
+                "ausbildungsdauer": {"type": "number"},
+                "type": {
+                    "type": "string",
+                    "description": "Gibt den Objecttyp an",
+                    "default": "PRAKTIKUM"
+                }
+            }
+        },
+        "DienstverhaeltnisBeamtenanwaerter": {
+            "type": "object",
+            "properties": {
+                "ausbildungsdauer": {"type": "number"},
+                "type": {
+                    "type": "string",
+                    "description": "Gibt den Objecttyp an",
+                    "default": "BEAMTENANWAERTER"
+                }
+            }
+        },
+        "DienstverhaeltnisRuhestand": {
+            "type": "object",
+            "properties": {
+                "wochenarbeitszeit": {"type": "number"},
+                "type": {
+                    "type": "string",
+                    "description": "Gibt den Objecttyp an",
+                    "default": "RUHESTAND"
+                }
+            }
+        }
+    },
+    "type": "object",
+    "properties": {
+        "data": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "anzahlPosten": {"type": "integer"},
+                    "aufgabenbereich": {
+                        "type": "array",
+                        "items": {"type": "string"}
+                    },
+                    "befristungDatum": {"type": "string"},
+                    "befristungMonate": {"type": "integer"},
+                    "behoerde": {"type": "string"},
+                    "behoerdeUrl": {"type": "string"},
+                    "beschaeftigungsbereich": {"type": "string"},
+                    "beschaeftigungsdauer": {"type": "string"},
+                    "bewerbungsprozess": {"type": "string"},
+                    "datumAenderung": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "datumBesetzung": {"type": "string"},
+                    "datumVeroeffentlicht": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "dienstverhaeltnise": {
+                        "type": "array",
+                        "items": {
+                            "anyOf": [
+                                {"$ref": "#/$defs/DienstverhaeltnisAngestellter"},
+                                {"$ref": "#/$defs/DienstverhaeltnisBeamter"},
+                                {"$ref": "#/$defs/DienstverhaeltnisDualesStudium"},
+                                {"$ref": "#/$defs/DienstverhaeltnisPraktikum"},
+                                {"$ref": "#/$defs/DienstverhaeltnisBeamtenanwaerter"},
+                                {"$ref": "#/$defs/DienstverhaeltnisAusbildung"},
+                                {"$ref": "#/$defs/DienstverhaeltnisRuhestand"}
+                            ]
+                        }
+                    },
+                    "einsatzorte": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "bundesland": {"type": "string"},
+                                "hausnummer": {"type": "string"},
+                                "latitude": {"type": "string"},
+                                "longitude": {"type": "string"},
+                                "ort": {"type": "string"},
+                                "plz": {"type": "string"},
+                                "strasse": {"type": "string"}
+                            }
+                        }
+                    },
+                    "fachrichtung": {"type": "string"},
+                    "id": {"type": "integer"},
+                    "kennung": {"type": "string"},
+                    "stellenbeschreibung": {"type": "string"},
+                    "stellenbezeichnung": {"type": "string"},
+                    "teilzeitVollzeit": {"type": "string"}
+                }
+            }
+        },
+        "errors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "cause": {"$ref": "#/$defs/Throwable"},
+                    "detailMessage": {"type": "string"},
+                    "stackTrace": {
+                        "type": "array",
+                        "items": {"$ref": "#/$defs/StackTraceElement"}
+                    },
+                    "suppressedExceptions": {
+                        "type": "array",
+                        "items": {"$ref": "#/$defs/Throwable"}
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,3257 @@
+Dockerfile:1: trailing whitespace.
+[32m+[m[32mFROM docker-virtual.dev.dvz-mv.net/python:3.11-slim[m[41m[m
+Dockerfile:2: trailing whitespace.
+[32m+[m[41m[m
+Dockerfile:3: trailing whitespace.
+[32m+[m[32mWORKDIR /app[m[41m[m
+Dockerfile:4: trailing whitespace.
+[32m+[m[41m[m
+Dockerfile:5: trailing whitespace.
+[32m+[m[32mCOPY requirements.txt .[m[41m[m
+Dockerfile:6: trailing whitespace.
+[32m+[m[32mRUN --mount=type=cache,target=/root/.cache/pip \[m[41m[m
+Dockerfile:7: trailing whitespace.
+[32m+[m[32m    pip install \[m[41m[m
+Dockerfile:8: trailing whitespace.
+[32m+[m[32m    --index-url https://dev.dvz-mv.net:443/artifactory/api/pypi/pypi-remote/simple/ \[m[41m[m
+Dockerfile:9: trailing whitespace.
+[32m+[m[32m    --trusted-host dev.dvz-mv.net \[m[41m[m
+Dockerfile:10: trailing whitespace.
+[32m+[m[32m    -r requirements.txt[m[41m[m
+Dockerfile:11: trailing whitespace.
+[32m+[m[41m[m
+Dockerfile:12: trailing whitespace.
+[32m+[m[32mCOPY models/de_50k.txt models/de_50k.txt[m[41m[m
+Dockerfile:13: trailing whitespace.
+[32m+[m[32mCOPY data/pgeocode/ /root/.cache/pgeocode/[m[41m[m
+Dockerfile:14: trailing whitespace.
+[32m+[m[32mCOPY src/ src/[m[41m[m
+Dockerfile:15: trailing whitespace.
+[32m+[m[41m[m
+Dockerfile:16: trailing whitespace.
+[32m+[m[32mEXPOSE 8000[m[41m[m
+Dockerfile:17: trailing whitespace.
+[32m+[m[41m[m
+README.md:1: trailing whitespace.
+[32m+[m[32m# ai-suche[m[41m[m
+README.md:2: trailing whitespace.
+[32m+[m[41m[m
+README.md:3: trailing whitespace.
+[32m+[m[32mREST-API für die semantische Vorauswahl/Suche über Interamt-Stellenausschreibungen. Kombiniert BM25, Dense Retrieval (FAISS + BAAI/bge-m3) und Hybrid-Fusion (RRF / Alpha / XGBoost-LTR) mit optionaler Query-Preprocessing-Pipeline und Reranking.s[m[41m[m
+README.md:4: trailing whitespace.
+[32m+[m[41m[m
+README.md:5: trailing whitespace.
+[32m+[m[32m## Architektur[m[41m[m
+README.md:6: trailing whitespace.
+[32m+[m[41m[m
+README.md:7: trailing whitespace.
+[32m+[m[32m```[m[41m[m
+README.md:8: trailing whitespace.
+[32m+[m[32mAnfrage → Query Preprocessing → Retrieval (BM25 / Dense) → Fusion (RRF / Alpha / XGB) → Reranking (optional) → Ergebnisse[m[41m[m
+README.md:9: trailing whitespace.
+[32m+[m[32m```[m[41m[m
+README.md:10: trailing whitespace.
+[32m+[m[41m[m
+README.md:11: trailing whitespace.
+[32m+[m[32m- **Query Preprocessing** (`src/retrieval/`): Rechtschreibkorrektur (`spell_correction.py`, symspellpy), Abkürzungsexpansion (`abbreviation_expansion.py`), Schreibvarianten/ß-ss/Gender-Suffixe (`spelling_variants.py`), Komposita-Zerlegung (`compound_splitter.py`), Behördensprache-Normalisierung (`behoerden_normalizer.py`)[m[41m[m
+README.md:12: trailing whitespace.
+[32m+[m[32m- **Retrieval**: BM25 (`bm25_retrieval.py`), Dense Retrieval mit FAISS + bge-m3 (`dense_retrieval.py`, `embedding_store.py`, `query_embedding_cache.py`)[m[41m[m
+README.md:13: trailing whitespace.
+[32m+[m[32m- **Fusion**: Reciprocal Rank Fusion (`rrf_fusion.py`), gewichtete Alpha-Fusion, XGBoost-basierte Learning-to-Rank-Fusion (`xgb_fusion_retriever.py`, `src/rerank/xgb_fusion.py`)[m[41m[m
+README.md:14: trailing whitespace.
+[32m+[m[32m- **Reranking** (optional): Cross-Encoder (`cross_encoder_reranker.py`), Knowledge-Graph-basiert (`kg_reranker.py`, `semantic_skill_kg.py`)[m[41m[m
+README.md:15: trailing whitespace.
+[32m+[m[32m- **API**: FastAPI-Service (`src/api/rest_service.py`)[m[41m[m
+README.md:16: trailing whitespace.
+[32m+[m[41m[m
+README.md:17: trailing whitespace.
+[32m+[m[32m## Voraussetzungen[m[41m[m
+README.md:18: trailing whitespace.
+[32m+[m[41m[m
+README.md:19: trailing whitespace.
+[32m+[m[32m- **Python 3.11 oder 3.12** (nicht 3.14 verwenden — `symspellpy` hat C++-Abhängigkeiten, die unter 3.14 nicht kompatibel sind)[m[41m[m
+README.md:20: trailing whitespace.
+[32m+[m[32m- Zugriff auf die Modell-Artefakte:[m[41m[m
+README.md:21: trailing whitespace.
+[32m+[m[32m  - Dense-Embedding-Index (FAISS, `BAAI/bge-m3`)[m[41m[m
+README.md:22: trailing whitespace.
+[32m+[m[32m  - Trainiertes XGB-Fusion-Modell unter `models/xgb_fusion.json` (wird beim Start geladen; falls nicht vorhanden, vorher mit `scripts/train_xgb_model.py` erzeugen)[m[41m[m
+README.md:23: trailing whitespace.
+[32m+[m[32m- Eine lokale `.env.local` mit `INTERAMT_API_KEY` für den täglichen Korpus-Abruf[m[41m[m
+README.md:24: trailing whitespace.
+[32m+[m[41m[m
+README.md:25: trailing whitespace.
+[32m+[m[32m## Setup[m[41m[m
+README.md:26: trailing whitespace.
+[32m+[m[41m[m
+README.md:27: trailing whitespace.
+[32m+[m[32m```bash[m[41m[m
+README.md:28: trailing whitespace.
+[32m+[m[32m# Virtuelle Umgebung anlegen[m[41m[m
+README.md:29: trailing whitespace.
+[32m+[m[32mpython3.11 -m venv .venv[m[41m[m
+README.md:30: trailing whitespace.
+[32m+[m[32msource .venv/bin/activate   # unter WSL/Linux[m[41m[m
+README.md:31: trailing whitespace.
+[32m+[m[41m[m
+README.md:32: trailing whitespace.
+[32m+[m[32m# Abhängigkeiten installieren[m[41m[m
+README.md:33: trailing whitespace.
+[32m+[m[32mpip install -r requirements.txt[m[41m[m
+README.md:34: trailing whitespace.
+[32m+[m[32m```[m[41m[m
+README.md:35: trailing whitespace.
+[32m+[m[41m[m
+README.md:36: trailing whitespace.
+[32m+[m[32m## Daten & Modelle vorbereiten[m[41m[m
+README.md:37: trailing whitespace.
+[32m+[m[41m[m
+README.md:38: trailing whitespace.
+[32m+[m[32m1. `INTERAMT_API_KEY` in der Umgebung oder in `.env.local` setzen. Beim Start und bei `POST /admin/reload` wird `https://mps.interamt.de/dtag/api/query` abgerufen. Das Feld `tbehoerde` wird rekursiv vor dem Einlesen entfernt.[m[41m[m
+README.md:39: trailing whitespace.
+[32m+[m[32m2. Dense-Embedding-Index initial aufbauen (wird beim ersten Start automatisch erzeugt). Die Corpus-Embeddings werden dabei in PostgreSQL gespeichert; der FAISS-Index wird weiterhin zur Laufzeit aus der Datenbank aufgebaut.[m[41m[m
+README.md:40: trailing whitespace.
+[32m+[m[32m3. XGB-Fusion-Modell trainieren, falls `models/xgb_fusion.json` noch nicht existiert:[m[41m[m
+README.md:41: trailing whitespace.
+[32m+[m[32m   ```bash[m[41m[m
+README.md:42: trailing whitespace.
+[32m+[m[32m   make train-xgb[m[41m[m
+README.md:43: trailing whitespace.
+[32m+[m[32m   ```[m[41m[m
+README.md:44: trailing whitespace.
+[32m+[m[41m[m
+README.md:45: trailing whitespace.
+[32m+[m[32m## API starten[m[41m[m
+README.md:46: trailing whitespace.
+[32m+[m[41m[m
+README.md:47: trailing whitespace.
+[32m+[m[32m```bash[m[41m[m
+README.md:48: trailing whitespace.
+[32m+[m[32mmake serve[m[41m[m
+README.md:49: trailing whitespace.
+[32m+[m[32m```[m[41m[m
+README.md:50: trailing whitespace.
+[32m+[m[41m[m
+README.md:51: trailing whitespace.
+[32m+[m[32mDer Prozess startet standardmäßig als `master`: Er ruft den Korpus ab und darf[m[41m[m
+README.md:52: trailing whitespace.
+[32m+[m[32mden Embedding-Cache in PostgreSQL aktualisieren. Weitere API-Instanzen können[m[41m[m
+README.md:53: trailing whitespace.
+[32m+[m[32mals lesende `worker` gestartet werden, indem `AI_SUCH_ROLE=worker` gesetzt wird.[m[41m[m
+README.md:54: trailing whitespace.
+[32m+[m[32mDer Master muss den Korpus und den Embedding-Cache zuerst aufgebaut haben.[m[41m[m
+README.md:55: trailing whitespace.
+[32m+[m[41m[m
+README.md:56: trailing whitespace.
+[32m+[m[32mMit Docker kann beispielsweise ein Master und danach ein Worker gestartet[m[41m[m
+README.md:57: trailing whitespace.
+[32m+[m[32mwerden:[m[41m[m
+README.md:58: trailing whitespace.
+[32m+[m[41m[m
+README.md:59: trailing whitespace.
+[32m+[m[32m```bash[m[41m[m
+README.md:60: trailing whitespace.
+[32m+[m[32mdocker compose up -d --build[m[41m[m
+README.md:61: trailing whitespace.
+[32m+[m[32mdocker compose run -d --name ai-suche-worker -p 8001:8000 \[m[41m[m
+README.md:62: trailing whitespace.
+[32m+[m[32m  -e AI_SUCH_ROLE=worker ai-suche-api[m[41m[m
+README.md:63: trailing whitespace.
+[32m+[m[32m```[m[41m[m
+README.md:64: trailing whitespace.
+[32m+[m[41m[m
+README.md:65: trailing whitespace.
+[32m+[m[32mWorker laden nur den vorhandenen Korpus und Embedding-Cache. Korpus-Download,[m[41m[m
+README.md:66: trailing whitespace.
+[32m+[m[32mSchema-Erzeugung, Cache-Schreibzugriffe und `POST /admin/reload` sind dort[m[41m[m
+README.md:67: trailing whitespace.
+[32m+[m[32mgesperrt.[m[41m[m
+README.md:68: trailing whitespace.
+[32m+[m[41m[m
+README.md:69: trailing whitespace.
+[32m+[m[32mDie interaktive Swagger-Dokumentation ist anschließend unter[m[41m[m
+README.md:70: trailing whitespace.
+[32m+[m[32m`http://localhost:8000/docs` erreichbar. Dort stehen beim Endpoint `POST /search`[m[41m[m
+README.md:71: trailing whitespace.
+[32m+[m[32mmehrere Beispielanfragen zur Auswahl und können direkt mit „Try it out“ ausgeführt[m[41m[m
+README.md:72: trailing whitespace.
+[32m+[m[32mwerden. Die OpenAPI-Spezifikation ist unter `http://localhost:8000/openapi.json`[m[41m[m
+README.md:73: trailing whitespace.
+[32m+[m[32mund ReDoc unter `http://localhost:8000/redoc` verfügbar.[m[41m[m
+README.md:74: trailing whitespace.
+[32m+[m[41m[m
+README.md:75: trailing whitespace.
+[32m+[m[32mFür den produktiven Betrieb empfiehlt sich ein Prozessmanager/Reverse Proxy davor (z. B. `systemd`-Service + nginx, oder ein Container-Setup), sowie mehrere Worker über `--workers`, sofern der Service zustandslos genug ist (Vorsicht: der Dense-Index und Caches werden pro Prozess geladen — RAM-Bedarf mit der Anzahl Worker multiplizieren).[m[41m[m
+README.md:76: trailing whitespace.
+[32m+[m[41m[m
+README.md:77: trailing whitespace.
+[32m+[m[32m## Endpunkte (Stand bekannter Architektur)[m[41m[m
+README.md:78: trailing whitespace.
+[32m+[m[41m[m
+README.md:79: trailing whitespace.
+[32m+[m[32m| Methode | Pfad | Beschreibung |[m[41m[m
+README.md:80: trailing whitespace.
+[32m+[m[32m|---|---|---|[m[41m[m
+README.md:81: trailing whitespace.
+[32m+[m[32m| `POST` | `/search` | Hauptsuche: Query-Preprocessing, Retrieval, Fusion, optionale Filter (z. B. `bereich`, `dienstort`, `beschaeftigungsart`, Geo-Radius) und Reranking. Antwort enthält u. a. `preprocessing_applied`, `final_query` sowie pro Treffer ein `details`-Objekt. |[m[41m[m
+README.md:82: trailing whitespace.
+[32m+[m[32m| `POST` | `/admin/reload` | Lädt Corpus/Modelle neu (Double-Buffering, ohne Downtime). |[m[41m[m
+README.md:83: trailing whitespace.
+[32m+[m[32m| `GET` | `/health` | Readiness-Check für Pipeline und PostgreSQL; liefert bei fehlender Bereitschaft HTTP `503`. |[m[41m[m
+README.md:84: trailing whitespace.
+[32m+[m[32m| `GET` | `/status` | Detaillierter Service- und Datenbankstatus inklusive Korpusgröße und aktiver Komponenten. |[m[41m[m
+README.md:85: trailing whitespace.
+[32m+[m[41m[m
+README.md:86: trailing whitespace.
+[32m+[m[32m### Beispielanfragen[m[41m[m
+README.md:87: trailing whitespace.
+[32m+[m[41m[m
+README.md:88: trailing whitespace.
+[32m+[m[32mDie Beispiele sind direkt in der Swagger-Oberfläche hinterlegt. Eine einfache Suche[m[41m[m
+README.md:89: trailing whitespace.
+[32m+[m[32mkann beispielsweise auch per `curl` ausgeführt werden:[m[41m[m
+README.md:90: trailing whitespace.
+[32m+[m[41m[m
+README.md:91: trailing whitespace.
+[32m+[m[32m```bash[m[41m[m
+README.md:92: trailing whitespace.
+[32m+[m[32mcurl -X POST http://localhost:8000/search \[m[41m[m
+README.md:93: trailing whitespace.
+[32m+[m[32m  -H "Content-Type: application/json" \[m[41m[m
+README.md:94: trailing whitespace.
+[32m+[m[32m  -d '{"query":"Sachbearbeiter IT-Sicherheit","top_k":10,"base":"bm25"}'[m[41m[m
+README.md:95: trailing whitespace.
+[32m+[m[32m```[m[41m[m
+README.md:96: trailing whitespace.
+[32m+[m[41m[m
+README.md:97: trailing whitespace.
+[32m+[m[41m[m
+README.md:98: trailing whitespace.
+[32m+[m[32m## Konfiguration[m[41m[m
+README.md:99: trailing whitespace.
+[32m+[m[41m[m
+README.md:100: trailing whitespace.
+[32m+[m[32m- Pfade zu Corpus, FAISS-Index, XGB-Modell[m[41m[m
+README.md:101: trailing whitespace.
+[32m+[m[32m- PostgreSQL-Verbindung für die Embedding-Datenbank über `EMBEDDING_DATABASE_URL`[m[41m[m
+README.md:102: trailing whitespace.
+[32m+[m[32m- Prozessrolle über `AI_SUCH_ROLE` (`master`, Standard, oder `worker`)[m[41m[m
+README.md:103: trailing whitespace.
+[32m+[m[32m- Modellname für Dense Retrieval (`BAAI/bge-m3`)[m[41m[m
+README.md:104: trailing whitespace.
+[32m+[m[32m- GPU/CPU-Auswahl für Cross-Encoder-Reranking[m[41m[m
+README.md:105: trailing whitespace.
+[32m+[m[32m- Cache-Verzeichnisse[m[41m[m
+README.md:106: trailing whitespace.
+[32m+[m[41m[m
+README.md:107: trailing whitespace.
+[32m+[m[32m## Bekannte Einschränkungen[m[41m[m
+README.md:108: trailing whitespace.
+[32m+[m[41m[m
+README.md:109: trailing whitespace.
+[32m+[m[32m- Kategoriale Vor-Filter (`bereich`/`dienstort`/`beschaeftigungsart`/`dienstverhaeltnis`) sind nur zuverlässig, wenn der Corpus mit strukturierten Feldern (nicht nur Text-Präambel) erzeugt wurde.[m[41m[m
+README.md:110: trailing whitespace.
+[32m+[m[32m- Der Dense-Index sowie diverse Caches (Query-Embeddings, Cross-Encoder-Scores, Semantic-Skill-KG) sind prozesslokal — bei mehreren Workern/Instanzen entsprechend Warm-up-Zeit und RAM einplanen.[m[41m[m
+README.md:111: trailing whitespace.
+[32m+[m[41m[m
+README.md:112: trailing whitespace.
+[32m+[m[32m## Troubleshooting[m[41m[m
+README.md:113: trailing whitespace.
+[32m+[m[41m[m
+README.md:114: trailing whitespace.
+[32m+[m[32m- **`FileNotFoundError` beim Speichern von Modellen/Caches**: Zielverzeichnis (`models/`) existiert nicht — wird durch `os.makedirs` beim Start erzeugt; falls der Fehler dennoch auftritt, Schreibrechte im Deployment-Verzeichnis prüfen.[m[41m[m
+README.md:115: trailing whitespace.
+[32m+[m[32m- **Leere/keine Ergebnisse bei gesetzten kategorialen Filtern**: Corpus-Schema prüfen (siehe "Bekannte Einschränkungen").[m[41m[m
+README.md:116: trailing whitespace.
+[32m+[m[32m- **PostgreSQL**: Mit `docker compose up --build` wird PostgreSQL mit `pgvector` gestartet. Die Embeddings liegen in der Tabelle `embeddings`; der Standardzugriff erfolgt über `EMBEDDING_DATABASE_URL`.[m[41m[m
+docs/architecture.svg:1: trailing whitespace.
+[32m+[m[32m<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 1600 1040" preserveAspectRatio="xMidYMin meet" role="img" aria-labelledby="title desc">[m[41m[m
+docs/architecture.svg:2: trailing whitespace.
+[32m+[m[32m  <title id="title">Architektur des Projekts ai-suche</title>[m[41m[m
+docs/architecture.svg:3: trailing whitespace.
+[32m+[m[32m  <desc id="desc">Architekturdiagramm der FastAPI-Suche mit Query-Preprocessing, BM25, Dense Retrieval, Fusion, optionalem Reranking, PostgreSQL und Interamt-API.</desc>[m[41m[m
+docs/architecture.svg:4: trailing whitespace.
+[32m+[m[32m  <defs>[m[41m[m
+docs/architecture.svg:5: trailing whitespace.
+[32m+[m[32m    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">[m[41m[m
+docs/architecture.svg:6: trailing whitespace.
+[32m+[m[32m      <stop offset="0" stop-color="#f7faf9"/>[m[41m[m
+docs/architecture.svg:7: trailing whitespace.
+[32m+[m[32m      <stop offset="1" stop-color="#e8f0f3"/>[m[41m[m
+docs/architecture.svg:8: trailing whitespace.
+[32m+[m[32m    </linearGradient>[m[41m[m
+docs/architecture.svg:9: trailing whitespace.
+[32m+[m[32m    <linearGradient id="api" x1="0" y1="0" x2="1" y2="1">[m[41m[m
+docs/architecture.svg:10: trailing whitespace.
+[32m+[m[32m      <stop offset="0" stop-color="#0f766e"/>[m[41m[m
+docs/architecture.svg:11: trailing whitespace.
+[32m+[m[32m      <stop offset="1" stop-color="#115e59"/>[m[41m[m
+docs/architecture.svg:12: trailing whitespace.
+[32m+[m[32m    </linearGradient>[m[41m[m
+docs/architecture.svg:13: trailing whitespace.
+[32m+[m[32m    <linearGradient id="retrieval" x1="0" y1="0" x2="1" y2="1">[m[41m[m
+docs/architecture.svg:14: trailing whitespace.
+[32m+[m[32m      <stop offset="0" stop-color="#2563eb"/>[m[41m[m
+docs/architecture.svg:15: trailing whitespace.
+[32m+[m[32m      <stop offset="1" stop-color="#1d4ed8"/>[m[41m[m
+docs/architecture.svg:16: trailing whitespace.
+[32m+[m[32m    </linearGradient>[m[41m[m
+docs/architecture.svg:17: trailing whitespace.
+[32m+[m[32m    <linearGradient id="rerank" x1="0" y1="0" x2="1" y2="1">[m[41m[m
+docs/architecture.svg:18: trailing whitespace.
+[32m+[m[32m      <stop offset="0" stop-color="#c2410c"/>[m[41m[m
+docs/architecture.svg:19: trailing whitespace.
+[32m+[m[32m      <stop offset="1" stop-color="#9a3412"/>[m[41m[m
+docs/architecture.svg:20: trailing whitespace.
+[32m+[m[32m    </linearGradient>[m[41m[m
+docs/architecture.svg:21: trailing whitespace.
+[32m+[m[32m    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">[m[41m[m
+docs/architecture.svg:22: trailing whitespace.
+[32m+[m[32m      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#12343b" flood-opacity="0.13"/>[m[41m[m
+docs/architecture.svg:23: trailing whitespace.
+[32m+[m[32m    </filter>[m[41m[m
+docs/architecture.svg:24: trailing whitespace.
+[32m+[m[32m    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">[m[41m[m
+docs/architecture.svg:25: trailing whitespace.
+[32m+[m[32m      <path d="M 0 0 L 10 5 L 0 10 z" fill="#52666b"/>[m[41m[m
+docs/architecture.svg:26: trailing whitespace.
+[32m+[m[32m    </marker>[m[41m[m
+docs/architecture.svg:27: trailing whitespace.
+[32m+[m[32m    <marker id="arrowLight" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">[m[41m[m
+docs/architecture.svg:28: trailing whitespace.
+[32m+[m[32m      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c7d9dc"/>[m[41m[m
+docs/architecture.svg:29: trailing whitespace.
+[32m+[m[32m    </marker>[m[41m[m
+docs/architecture.svg:30: trailing whitespace.
+[32m+[m[32m    <style>[m[41m[m
+docs/architecture.svg:31: trailing whitespace.
+[32m+[m[32m      .title { font: 700 34px 'Segoe UI', sans-serif; fill: #12343b; letter-spacing: 0; }[m[41m[m
+docs/architecture.svg:32: trailing whitespace.
+[32m+[m[32m      .subtitle { font: 400 16px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 0; }[m[41m[m
+docs/architecture.svg:33: trailing whitespace.
+[32m+[m[32m      .section { font: 700 15px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 1.5px; }[m[41m[m
+docs/architecture.svg:34: trailing whitespace.
+[32m+[m[32m      .boxTitle { font: 700 19px 'Segoe UI', sans-serif; fill: #12343b; letter-spacing: 0; }[m[41m[m
+docs/architecture.svg:35: trailing whitespace.
+[32m+[m[32m      .boxText { font: 400 14px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 0; }[m[41m[m
+docs/architecture.svg:36: trailing whitespace.
+[32m+[m[32m      .whiteTitle { font: 700 18px 'Segoe UI', sans-serif; fill: #ffffff; letter-spacing: 0; }[m[41m[m
+docs/architecture.svg:37: trailing whitespace.
+[32m+[m[32m      .whiteText { font: 400 13px 'Segoe UI', sans-serif; fill: #d7efed; letter-spacing: 0; }[m[41m[m
+docs/architecture.svg:38: trailing whitespace.
+[32m+[m[32m      .small { font: 400 12px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 0; }[m[41m[m
+docs/architecture.svg:39: trailing whitespace.
+[32m+[m[32m      .flow { font: 600 12px 'Segoe UI', sans-serif; fill: #52666b; letter-spacing: 0; }[m[41m[m
+docs/architecture.svg:40: trailing whitespace.
+[32m+[m[32m      .line { stroke: #52666b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }[m[41m[m
+docs/architecture.svg:41: trailing whitespace.
+[32m+[m[32m      .dashed { stroke: #82969a; stroke-width: 2; stroke-dasharray: 8 7; fill: none; marker-end: url(#arrow); }[m[41m[m
+docs/architecture.svg:42: trailing whitespace.
+[32m+[m[32m    </style>[m[41m[m
+docs/architecture.svg:43: trailing whitespace.
+[32m+[m[32m  </defs>[m[41m[m
+docs/architecture.svg:44: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:45: trailing whitespace.
+[32m+[m[32m  <rect width="1600" height="1040" fill="#ffffff"/>[m[41m[m
+docs/architecture.svg:46: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:47: trailing whitespace.
+[32m+[m[32m  <text x="80" y="72" class="title">ai-suche · Systemarchitektur</text>[m[41m[m
+docs/architecture.svg:48: trailing whitespace.
+[32m+[m[32m  <text x="80" y="103" class="subtitle">Semantische Vorauswahl und Suche über Interamt-Stellenausschreibungen</text>[m[41m[m
+docs/architecture.svg:49: trailing whitespace.
+[32m+[m[32m  <line x1="80" y1="132" x2="1520" y2="132" stroke="#c7d9dc" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:50: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:51: trailing whitespace.
+[32m+[m[32m  <text x="80" y="172" class="section">LAUFZEIT · POST /search</text>[m[41m[m
+docs/architecture.svg:52: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:53: trailing whitespace.
+[32m+[m[32m  <!-- Client -->[m[41m[m
+docs/architecture.svg:54: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:55: trailing whitespace.
+[32m+[m[32m    <rect x="80" y="210" width="205" height="120" rx="12" fill="#ffffff" stroke="#c7d9dc" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:56: trailing whitespace.
+[32m+[m[32m    <rect x="80" y="210" width="205" height="10" rx="5" fill="#12343b"/>[m[41m[m
+docs/architecture.svg:57: trailing whitespace.
+[32m+[m[32m      <text x="105" y="253" class="boxTitle">Nutzer / Client</text>[m[41m[m
+docs/architecture.svg:58: trailing whitespace.
+[32m+[m[32m    <text x="105" y="280" class="boxText">Swagger / REST-Anfrage</text>[m[41m[m
+docs/architecture.svg:59: trailing whitespace.
+[32m+[m[32m    <text x="105" y="304" class="small">POST /search · Treffer · Filter</text>[m[41m[m
+docs/architecture.svg:60: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:61: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:62: trailing whitespace.
+[32m+[m[32m  <!-- API -->[m[41m[m
+docs/architecture.svg:63: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:64: trailing whitespace.
+[32m+[m[32m    <rect x="350" y="190" width="275" height="160" rx="12" fill="url(#api)"/>[m[41m[m
+docs/architecture.svg:65: trailing whitespace.
+[32m+[m[32m    <text x="380" y="235" class="whiteTitle">FastAPI-Dienst</text>[m[41m[m
+docs/architecture.svg:66: trailing whitespace.
+[32m+[m[32m    <text x="380" y="265" class="whiteText">Anfrageprüfung · Laufzeitstatus</text>[m[41m[m
+docs/architecture.svg:67: trailing whitespace.
+[32m+[m[32m    <text x="380" y="290" class="whiteText">Vorfilter: Ort, PLZ, Radius</text>[m[41m[m
+docs/architecture.svg:68: trailing whitespace.
+[32m+[m[32m    <text x="380" y="315" class="whiteText">Neuladen · Health · Status</text>[m[41m[m
+docs/architecture.svg:69: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:70: trailing whitespace.
+[32m+[m[32m  <line x1="285" y1="270" x2="350" y2="270" class="line"/>[m[41m[m
+docs/architecture.svg:71: trailing whitespace.
+[32m+[m[32m  <text x="317" y="253" text-anchor="middle" class="flow">HTTP</text>[m[41m[m
+docs/architecture.svg:72: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:73: trailing whitespace.
+[32m+[m[32m  <!-- Preprocessing -->[m[41m[m
+docs/architecture.svg:74: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:75: trailing whitespace.
+[32m+[m[32m    <rect x="690" y="190" width="275" height="160" rx="12" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:76: trailing whitespace.
+[32m+[m[32m    <rect x="690" y="190" width="275" height="10" rx="5" fill="#0f766e"/>[m[41m[m
+docs/architecture.svg:77: trailing whitespace.
+[32m+[m[32m    <text x="720" y="235" class="boxTitle">Anfrage-Aufbereitung</text>[m[41m[m
+docs/architecture.svg:78: trailing whitespace.
+[32m+[m[32m    <text x="720" y="265" class="boxText">Rechtschreibkorrektur</text>[m[41m[m
+docs/architecture.svg:79: trailing whitespace.
+[32m+[m[32m    <text x="720" y="287" class="boxText">Abkürzungen erweitern</text>[m[41m[m
+docs/architecture.svg:80: trailing whitespace.
+[32m+[m[32m    <text x="720" y="309" class="boxText">Schreibvarianten / Komposita</text>[m[41m[m
+docs/architecture.svg:81: trailing whitespace.
+[32m+[m[32m    <text x="720" y="331" class="boxText">Behördensprache normalisieren</text>[m[41m[m
+docs/architecture.svg:82: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:83: trailing whitespace.
+[32m+[m[32m  <line x1="625" y1="270" x2="690" y2="270" class="line"/>[m[41m[m
+docs/architecture.svg:84: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:85: trailing whitespace.
+[32m+[m[32m  <!-- Retrieval -->[m[41m[m
+docs/architecture.svg:86: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:87: trailing whitespace.
+[32m+[m[32m    <rect x="1030" y="165" width="430" height="210" rx="12" fill="url(#retrieval)"/>[m[41m[m
+docs/architecture.svg:88: trailing whitespace.
+[32m+[m[32m    <text x="1060" y="210" class="whiteTitle">Suche und Zusammenführung</text>[m[41m[m
+docs/architecture.svg:89: trailing whitespace.
+[32m+[m[32m    <rect x="1060" y="235" width="170" height="90" rx="8" fill="#ffffff" opacity="0.96"/>[m[41m[m
+docs/architecture.svg:90: trailing whitespace.
+[32m+[m[32m    <text x="1080" y="265" class="boxTitle">BM25</text>[m[41m[m
+docs/architecture.svg:91: trailing whitespace.
+[32m+[m[32m    <text x="1080" y="290" class="boxText">Stichwortsuche</text>[m[41m[m
+docs/architecture.svg:92: trailing whitespace.
+[32m+[m[32m    <text x="1080" y="311" class="boxText">Schlüsselwort-Scores</text>[m[41m[m
+docs/architecture.svg:93: trailing whitespace.
+[32m+[m[32m    <rect x="1250" y="235" width="170" height="90" rx="8" fill="#ffffff" opacity="0.96"/>[m[41m[m
+docs/architecture.svg:94: trailing whitespace.
+[32m+[m[32m    <text x="1270" y="265" class="boxTitle">Dense</text>[m[41m[m
+docs/architecture.svg:95: trailing whitespace.
+[32m+[m[32m    <text x="1270" y="290" class="boxText">bge-m3 + FAISS</text>[m[41m[m
+docs/architecture.svg:96: trailing whitespace.
+[32m+[m[32m    <text x="1270" y="311" class="boxText">Vektor-Scores</text>[m[41m[m
+docs/architecture.svg:97: trailing whitespace.
+[32m+[m[32m    <text x="1060" y="354" class="whiteText">RRF · Alpha · XGBoost-LTR</text>[m[41m[m
+docs/architecture.svg:98: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:99: trailing whitespace.
+[32m+[m[32m  <line x1="965" y1="270" x2="1030" y2="270" class="line"/>[m[41m[m
+docs/architecture.svg:100: trailing whitespace.
+[32m+[m[32m  <text x="997" y="253" text-anchor="middle" class="flow">Suchtext</text>[m[41m[m
+docs/architecture.svg:101: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:102: trailing whitespace.
+[32m+[m[32m  <!-- Rerank -->[m[41m[m
+docs/architecture.svg:103: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:104: trailing whitespace.
+[32m+[m[32m    <rect x="80" y="445" width="435" height="165" rx="12" fill="url(#rerank)"/>[m[41m[m
+docs/architecture.svg:105: trailing whitespace.
+[32m+[m[32m    <text x="110" y="490" class="whiteTitle">Optionale Nachsortierung</text>[m[41m[m
+docs/architecture.svg:106: trailing whitespace.
+[32m+[m[32m    <text x="110" y="523" class="whiteText">Wissensgraph · Kompetenzgraph</text>[m[41m[m
+docs/architecture.svg:107: trailing whitespace.
+[32m+[m[32m    <text x="110" y="545" class="whiteText">Cross-Encoder</text>[m[41m[m
+docs/architecture.svg:108: trailing whitespace.
+[32m+[m[32m    <text x="110" y="565" class="whiteText">bge-reranker-v2-m3</text>[m[41m[m
+docs/architecture.svg:109: trailing whitespace.
+[32m+[m[32m    <text x="110" y="592" class="whiteText">Kandidatenpool → Top-k-Ranking</text>[m[41m[m
+docs/architecture.svg:110: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:111: trailing whitespace.
+[32m+[m[32m  <path d="M1245 375 V410 H298 V445" class="line"/>[m[41m[m
+docs/architecture.svg:112: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:113: trailing whitespace.
+[32m+[m[32m  <!-- Output -->[m[41m[m
+docs/architecture.svg:114: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:115: trailing whitespace.
+[32m+[m[32m    <rect x="650" y="445" width="390" height="165" rx="12" fill="#ffffff" stroke="#c7d9dc" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:116: trailing whitespace.
+[32m+[m[32m    <rect x="650" y="445" width="390" height="10" rx="5" fill="#12343b"/>[m[41m[m
+docs/architecture.svg:117: trailing whitespace.
+[32m+[m[32m    <text x="680" y="490" class="boxTitle">Ergebnisse</text>[m[41m[m
+docs/architecture.svg:118: trailing whitespace.
+[32m+[m[32m    <text x="680" y="522" class="boxText">Ranked Documents · Scores</text>[m[41m[m
+docs/architecture.svg:119: trailing whitespace.
+[32m+[m[32m    <text x="680" y="548" class="boxText">Metadata · Snippet · Details</text>[m[41m[m
+docs/architecture.svg:120: trailing whitespace.
+[32m+[m[32m    <text x="680" y="579" class="boxText">Sortierung: Relevanz / Aktualität / Distanz</text>[m[41m[m
+docs/architecture.svg:121: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:122: trailing whitespace.
+[32m+[m[32m  <line x1="515" y1="527" x2="650" y2="527" class="line"/>[m[41m[m
+docs/architecture.svg:123: trailing whitespace.
+[32m+[m[32m  <path d="M650 445 H630 V400 H182 V330" class="line"/>[m[41m[m
+docs/architecture.svg:124: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:125: trailing whitespace.
+[32m+[m[32m  <!-- Runtime note -->[m[41m[m
+docs/architecture.svg:126: trailing whitespace.
+[32m+[m[32m  <rect x="1110" y="455" width="350" height="135" rx="12" fill="#e5f2f1" stroke="#a8d1cc" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:127: trailing whitespace.
+[32m+[m[32m  <text x="1140" y="492" class="boxTitle">Pipeline-Komponenten</text>[m[41m[m
+docs/architecture.svg:128: trailing whitespace.
+[32m+[m[32m  <text x="1140" y="520" class="boxText">Scorer + QE + KG + CE</text>[m[41m[m
+docs/architecture.svg:129: trailing whitespace.
+[32m+[m[32m  <text x="1140" y="546" class="boxText">frei kombinierbar</text>[m[41m[m
+docs/architecture.svg:130: trailing whitespace.
+[32m+[m[32m  <text x="1140" y="572" class="small">BM25 / Dense / RRF / Alpha / XGB</text>[m[41m[m
+docs/architecture.svg:131: trailing whitespace.
+[32m+[m[32m  <path d="M1040 527 H1110" class="dashed"/>[m[41m[m
+docs/architecture.svg:132: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:133: trailing whitespace.
+[32m+[m[32m  <!-- Data plane -->[m[41m[m
+docs/architecture.svg:134: trailing whitespace.
+[32m+[m[32m  <text x="80" y="690" class="section">DATEN &amp; BETRIEB · STARTUP / POST /admin/reload</text>[m[41m[m
+docs/architecture.svg:135: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:136: trailing whitespace.
+[32m+[m[32m    <rect x="80" y="730" width="270" height="170" rx="12" fill="#ffffff" stroke="#c7d9dc" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:137: trailing whitespace.
+[32m+[m[32m    <text x="110" y="775" class="boxTitle">Interamt API</text>[m[41m[m
+docs/architecture.svg:138: trailing whitespace.
+[32m+[m[32m    <text x="110" y="805" class="boxText">Korpus-Abruf</text>[m[41m[m
+docs/architecture.svg:139: trailing whitespace.
+[32m+[m[32m    <text x="110" y="831" class="boxText">Stellenausschreibungen</text>[m[41m[m
+docs/architecture.svg:140: trailing whitespace.
+[32m+[m[32m    <text x="110" y="866" class="small">Master-only Schreibzugriff</text>[m[41m[m
+docs/architecture.svg:141: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:142: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:143: trailing whitespace.
+[32m+[m[32m    <rect x="470" y="730" width="270" height="170" rx="12" fill="#ffffff" stroke="#c7d9dc" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:144: trailing whitespace.
+[32m+[m[32m    <text x="500" y="775" class="boxTitle">Laufzeit-Korpus</text>[m[41m[m
+docs/architecture.svg:145: trailing whitespace.
+[32m+[m[32m    <text x="500" y="805" class="boxText">corpus.jsonl</text>[m[41m[m
+docs/architecture.svg:146: trailing whitespace.
+[32m+[m[32m    <text x="500" y="831" class="boxText">strukturierte Metadaten</text>[m[41m[m
+docs/architecture.svg:147: trailing whitespace.
+[32m+[m[32m    <text x="500" y="866" class="small">Filterbasis und Ergebnisdetails</text>[m[41m[m
+docs/architecture.svg:148: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:149: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:150: trailing whitespace.
+[32m+[m[32m    <rect x="860" y="710" width="300" height="210" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:151: trailing whitespace.
+[32m+[m[32m    <rect x="860" y="710" width="300" height="10" rx="5" fill="#2563eb"/>[m[41m[m
+docs/architecture.svg:152: trailing whitespace.
+[32m+[m[32m    <text x="890" y="755" class="boxTitle">PostgreSQL + pgvector</text>[m[41m[m
+docs/architecture.svg:153: trailing whitespace.
+[32m+[m[32m    <text x="890" y="788" class="boxText">Embedding-Speicher</text>[m[41m[m
+docs/architecture.svg:154: trailing whitespace.
+[32m+[m[32m    <text x="890" y="814" class="boxText">inkrementeller Embedding-Cache</text>[m[41m[m
+docs/architecture.svg:155: trailing whitespace.
+[32m+[m[32m    <text x="890" y="840" class="boxText">nur neue/geänderte Dokumente</text>[m[41m[m
+docs/architecture.svg:156: trailing whitespace.
+[32m+[m[32m    <text x="890" y="880" class="small">Master schreibt · Worker lesen</text>[m[41m[m
+docs/architecture.svg:157: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:158: trailing whitespace.
+[32m+[m[32m  <g filter="url(#shadow)">[m[41m[m
+docs/architecture.svg:159: trailing whitespace.
+[32m+[m[32m    <rect x="1220" y="710" width="300" height="210" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>[m[41m[m
+docs/architecture.svg:160: trailing whitespace.
+[32m+[m[32m    <rect x="1220" y="710" width="300" height="10" rx="5" fill="#2563eb"/>[m[41m[m
+docs/architecture.svg:161: trailing whitespace.
+[32m+[m[32m    <text x="1250" y="755" class="boxTitle">Modelle und Indizes</text>[m[41m[m
+docs/architecture.svg:162: trailing whitespace.
+[32m+[m[32m    <text x="1250" y="790" class="boxText">bge-m3</text>[m[41m[m
+docs/architecture.svg:163: trailing whitespace.
+[32m+[m[32m    <text x="1250" y="816" class="boxText">FAISS IndexFlatIP</text>[m[41m[m
+docs/architecture.svg:164: trailing whitespace.
+[32m+[m[32m    <text x="1250" y="842" class="boxText">XGBoost-Modell</text>[m[41m[m
+docs/architecture.svg:165: trailing whitespace.
+[32m+[m[32m    <text x="1250" y="868" class="boxText">Cross-Encoder / KG Cache</text>[m[41m[m
+docs/architecture.svg:166: trailing whitespace.
+[32m+[m[32m  </g>[m[41m[m
+docs/architecture.svg:167: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:168: trailing whitespace.
+[32m+[m[32m  <path d="M350 815 H470" class="line"/>[m[41m[m
+docs/architecture.svg:169: trailing whitespace.
+[32m+[m[32m  <path d="M740 815 H860" class="line"/>[m[41m[m
+docs/architecture.svg:170: trailing whitespace.
+[32m+[m[32m  <path d="M1160 815 H1220" class="line"/>[m[41m[m
+docs/architecture.svg:171: trailing whitespace.
+[32m+[m[32m  <path d="M995 710 V610" class="dashed"/>[m[41m[m
+docs/architecture.svg:172: trailing whitespace.
+[32m+[m[32m  <path d="M1385 710 V640 H1460 V375" class="dashed"/>[m[41m[m
+docs/architecture.svg:173: trailing whitespace.
+[32m+[m[41m[m
+docs/architecture.svg:174: trailing whitespace.
+[32m+[m[32m  <!-- Deployment -->[m[41m[m
+docs/architecture.svg:175: trailing whitespace.
+[32m+[m[32m  <rect x="80" y="955" width="1440" height="44" rx="8" fill="#12343b"/>[m[41m[m
+docs/architecture.svg:176: trailing whitespace.
+[32m+[m[32m  <text x="110" y="983" class="whiteText">Betrieb mit Docker Compose</text>[m[41m[m
+docs/architecture.svg:177: trailing whitespace.
+[32m+[m[32m  <text x="390" y="983" class="whiteText">PostgreSQL/pgvector</text>[m[41m[m
+docs/architecture.svg:178: trailing whitespace.
+[32m+[m[32m  <text x="635" y="983" class="whiteText">ai-suche-api</text>[m[41m[m
+docs/architecture.svg:179: trailing whitespace.
+[32m+[m[32m  <text x="815" y="983" class="whiteText">Master + optionale Worker</text>[m[41m[m
+docs/architecture.svg:180: trailing whitespace.
+[32m+[m[32m  <text x="1190" y="983" class="whiteText">Port 8000</text>[m[41m[m
+docs/architecture.svg:181: trailing whitespace.
+[32m+[m[32m</svg>[m[41m[m
+requirements.txt:1: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:2: trailing whitespace.
+[32m+[m[32m# CORE DATA HANDLING[m[41m[m
+requirements.txt:3: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:4: trailing whitespace.
+[32m+[m[32mpandas>=2.0[m[41m[m
+requirements.txt:5: trailing whitespace.
+[32m+[m[32mnumpy>=1.24[m[41m[m
+requirements.txt:6: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:7: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:8: trailing whitespace.
+[32m+[m[32m# IR / RETRIEVAL[m[41m[m
+requirements.txt:9: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:10: trailing whitespace.
+[32m+[m[32mrank-bm25>=0.2.2[m[41m[m
+requirements.txt:11: trailing whitespace.
+[32m+[m[32mscikit-learn>=1.3[m[41m[m
+requirements.txt:12: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:13: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:14: trailing whitespace.
+[32m+[m[32m# DENSE RETRIEVAL[m[41m[m
+requirements.txt:15: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:16: trailing whitespace.
+[32m+[m[32msentence-transformers>=2.7.0[m[41m[m
+requirements.txt:17: trailing whitespace.
+[32m+[m[32mtorch>=2.1[m[41m[m
+requirements.txt:18: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:19: trailing whitespace.
+[32m+[m[32m# FAISS (CPU version is safest for reproducibility)[m[41m[m
+requirements.txt:20: trailing whitespace.
+[32m+[m[32mfaiss-cpu>=1.7.4[m[41m[m
+requirements.txt:21: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:22: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:23: trailing whitespace.
+[32m+[m[32m# RERANKING[m[41m[m
+requirements.txt:24: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:25: trailing whitespace.
+[32m+[m[32mtransformers>=4.40[m[41m[m
+requirements.txt:26: trailing whitespace.
+[32m+[m[32mtokenizers>=0.15[m[41m[m
+requirements.txt:27: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:28: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:29: trailing whitespace.
+[32m+[m[32m# GRAPH / KG (optional but useful)[m[41m[m
+requirements.txt:30: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:31: trailing whitespace.
+[32m+[m[32mnetworkx>=3.2[m[41m[m
+requirements.txt:32: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:33: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:34: trailing whitespace.
+[32m+[m[32m# EVALUATION[m[41m[m
+requirements.txt:35: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:36: trailing whitespace.
+[32m+[m[32mtqdm>=4.66[m[41m[m
+requirements.txt:37: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:38: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:39: trailing whitespace.
+[32m+[m[32m# VISUALIZATION[m[41m[m
+requirements.txt:40: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:41: trailing whitespace.
+[32m+[m[32mmatplotlib>=3.8[m[41m[m
+requirements.txt:42: trailing whitespace.
+[32m+[m[32mseaborn>=0.13[m[41m[m
+requirements.txt:43: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:44: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:45: trailing whitespace.
+[32m+[m[32m# UTILITIES[m[41m[m
+requirements.txt:46: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:47: trailing whitespace.
+[32m+[m[32mpython-dotenv>=1.0[m[41m[m
+requirements.txt:48: trailing whitespace.
+[32m+[m[32mpyyaml>=6.0[m[41m[m
+requirements.txt:49: trailing whitespace.
+[32m+[m[32mpsycopg[binary]>=3.2[m[41m[m
+requirements.txt:50: trailing whitespace.
+[32m+[m[32mpgvector>=0.5[m[41m[m
+requirements.txt:51: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:52: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:53: trailing whitespace.
+[32m+[m[32m# DEV / DEBUG (optional but useful in thesis)[m[41m[m
+requirements.txt:54: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:55: trailing whitespace.
+[32m+[m[32mipykernel>=6.29[m[41m[m
+requirements.txt:56: trailing whitespace.
+[32m+[m[32mxgboost>=2.0.0[m[41m[m
+requirements.txt:57: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:58: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:59: trailing whitespace.
+[32m+[m[32m# REST SERVICE[m[41m[m
+requirements.txt:60: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:61: trailing whitespace.
+[32m+[m[32mfastapi>=0.111[m[41m[m
+requirements.txt:62: trailing whitespace.
+[32m+[m[32muvicorn[standard]>=0.29[m[41m[m
+requirements.txt:63: trailing whitespace.
+[32m+[m[32mpgeocode>=0.4.1[m[41m[m
+requirements.txt:64: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:65: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:66: trailing whitespace.
+[32m+[m[32m# SPELL CORRECTION[m[41m[m
+requirements.txt:67: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:68: trailing whitespace.
+[32m+[m[32msymspellpy>=6.7.7[m[41m[m
+requirements.txt:69: trailing whitespace.
+[32m+[m[41m[m
+requirements.txt:70: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+requirements.txt:71: trailing whitespace.
+[32m+[m[32m# NLP / STEMMING[m[41m[m
+requirements.txt:72: trailing whitespace.
+[32m+[m[32m# =========================[m[41m[m
+src/api/rest_service.py:1: trailing whitespace.
+[32m+[m[32m"""[m[41m[m
+src/api/rest_service.py:2: trailing whitespace.
+[32m+[m[32mREST Service für die Interamt-Retrieval-Pipeline.[m[41m[m
+src/api/rest_service.py:3: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:4: trailing whitespace.
+[32m+[m[32mStartet einen FastAPI-Server, der die bestehende ComponentPipeline[m[41m[m
+src/api/rest_service.py:5: trailing whitespace.
+[32m+[m[32m(BM25 / Dense / RRF / Alpha / XGB + optional QE / CE) über einen[m[41m[m
+src/api/rest_service.py:6: trailing whitespace.
+[32m+[m[32m/search Endpoint verfügbar macht.[m[41m[m
+src/api/rest_service.py:7: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:8: trailing whitespace.
+[32m+[m[32mZusätzlich unterstützt der Endpoint ein Filter-Objekt, das VOR dem[m[41m[m
+src/api/rest_service.py:9: trailing whitespace.
+[32m+[m[32meigentlichen Retrieval angewendet wird (Pre-Filter): die Kandidatenmenge[m[41m[m
+src/api/rest_service.py:10: trailing whitespace.
+[32m+[m[32mwird anhand von PLZ/Ort + Radius, Dienstverhältnis, Bereich,[m[41m[m
+src/api/rest_service.py:11: trailing whitespace.
+[32m+[m[32mBeschäftigungsdauer, Dienstort und Teilzeit/Vollzeit eingeschränkt,[m[41m[m
+src/api/rest_service.py:12: trailing whitespace.
+[32m+[m[32mbevor BM25/Dense/etc. überhaupt scoren.[m[41m[m
+src/api/rest_service.py:13: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:14: trailing whitespace.
+[32m+[m[32mNEU: /admin/reload Endpoint, um den Korpus (und alle davon abgeleiteten[m[41m[m
+src/api/rest_service.py:15: trailing whitespace.
+[32m+[m[32mKomponenten) zur Laufzeit zu aktualisieren, ohne den Prozess neu zu[m[41m[m
+src/api/rest_service.py:16: trailing whitespace.
+[32m+[m[32mstarten. Die neue Pipeline wird komplett in einem separaten Objekt[m[41m[m
+src/api/rest_service.py:17: trailing whitespace.
+[32m+[m[32maufgebaut ("Double Buffering") und erst danach atomar eingehängt, damit[m[41m[m
+src/api/rest_service.py:18: trailing whitespace.
+[32m+[m[32mlaufende /search-Requests währenddessen nie einen halb-aktualisierten[m[41m[m
+src/api/rest_service.py:19: trailing whitespace.
+[32m+[m[32mZustand sehen. DenseRetriever nutzt dabei intern einen inkrementellen[m[41m[m
+src/api/rest_service.py:20: trailing whitespace.
+[32m+[m[32mEmbedding-Cache (nur neue/geänderte Dokumente werden neu encodiert).[m[41m[m
+src/api/rest_service.py:21: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:22: trailing whitespace.
+[32m+[m[32mStart:[m[41m[m
+src/api/rest_service.py:23: trailing whitespace.
+[32m+[m[32m    uvicorn rest_service:app --reload --port 8000[m[41m[m
+src/api/rest_service.py:24: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:25: trailing whitespace.
+[32m+[m[32mBeispiel-Request:[m[41m[m
+src/api/rest_service.py:26: trailing whitespace.
+[32m+[m[32m    POST /search[m[41m[m
+src/api/rest_service.py:27: trailing whitespace.
+[32m+[m[32m    {[m[41m[m
+src/api/rest_service.py:28: trailing whitespace.
+[32m+[m[32m        "query": "Sachbearbeiter IT-Sicherheit",[m[41m[m
+src/api/rest_service.py:29: trailing whitespace.
+[32m+[m[32m        "top_k": 10,[m[41m[m
+src/api/rest_service.py:30: trailing whitespace.
+[32m+[m[32m        "base": "bm25",[m[41m[m
+src/api/rest_service.py:31: trailing whitespace.
+[32m+[m[32m        "use_qe": true,[m[41m[m
+src/api/rest_service.py:32: trailing whitespace.
+[32m+[m[32m        "use_ce": true,[m[41m[m
+src/api/rest_service.py:33: trailing whitespace.
+[32m+[m[32m        "filters": {[m[41m[m
+src/api/rest_service.py:34: trailing whitespace.
+[32m+[m[32m            "plz_oder_ort": "18055",[m[41m[m
+src/api/rest_service.py:35: trailing whitespace.
+[32m+[m[32m            "max_distance_km": 50,[m[41m[m
+src/api/rest_service.py:36: trailing whitespace.
+[32m+[m[32m            "beschaeftigungsart": "Vollzeit",[m[41m[m
+src/api/rest_service.py:37: trailing whitespace.
+[32m+[m[32m            "dienstverhaeltnis": ["Beamter", "Angestellter"][m[41m[m
+src/api/rest_service.py:38: trailing whitespace.
+[32m+[m[32m        }[m[41m[m
+src/api/rest_service.py:39: trailing whitespace.
+[32m+[m[32m    }[m[41m[m
+src/api/rest_service.py:40: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:41: trailing whitespace.
+[32m+[m[32mBeispiel-Request (Reload nach Korpus-Update):[m[41m[m
+src/api/rest_service.py:42: trailing whitespace.
+[32m+[m[32m    POST /admin/reload[m[41m[m
+src/api/rest_service.py:43: trailing whitespace.
+[32m+[m[32m    -> liest corpus.jsonl neu ein, encodiert nur geänderte/neue Docs,[m[41m[m
+src/api/rest_service.py:44: trailing whitespace.
+[32m+[m[32m    baut BM25/FAISS/CE/Alpha/XGB neu auf und tauscht den globalen[m[41m[m
+src/api/rest_service.py:45: trailing whitespace.
+[32m+[m[32m       State atomar aus.[m[41m[m
+src/api/rest_service.py:46: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:47: trailing whitespace.
+[32m+[m[32mNEU: /evaluate und /evaluate/grid Endpoints. Beide nutzen die bereits[m[41m[m
+src/api/rest_service.py:48: trailing whitespace.
+[32m+[m[32mbeim Startup/Reload initialisierten Komponenten (BM25/Dense/CE/QE)[m[41m[m
+src/api/rest_service.py:49: trailing whitespace.
+[32m+[m[32mwieder -- es wird NICHTS davon neu aufgebaut, nur evaluate_model() auf[m[41m[m
+src/api/rest_service.py:50: trailing whitespace.
+[32m+[m[32mBasis von queries.jsonl + qrels/test.tsv (aus demselben DATASET_DIR)[m[41m[m
+src/api/rest_service.py:51: trailing whitespace.
+[32m+[m[32mausgeführt. Das entspricht fachlich run_pipeline_grid.py, nur eben ohne[m[41m[m
+src/api/rest_service.py:52: trailing whitespace.
+[32m+[m[32mden teuren Re-Init aller Retriever bei jedem Aufruf.[m[41m[m
+src/api/rest_service.py:53: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:54: trailing whitespace.
+[32m+[m[32mBeispiel-Request (einzelne Kombination):[m[41m[m
+src/api/rest_service.py:55: trailing whitespace.
+[32m+[m[32m    POST /evaluate[m[41m[m
+src/api/rest_service.py:56: trailing whitespace.
+[32m+[m[32m    {[m[41m[m
+src/api/rest_service.py:57: trailing whitespace.
+[32m+[m[32m        "base": "rrf",[m[41m[m
+src/api/rest_service.py:58: trailing whitespace.
+[32m+[m[32m        "use_qe": true,[m[41m[m
+src/api/rest_service.py:59: trailing whitespace.
+[32m+[m[32m        "use_ce": true,[m[41m[m
+src/api/rest_service.py:60: trailing whitespace.
+[32m+[m[32m        "k": 10,[m[41m[m
+src/api/rest_service.py:61: trailing whitespace.
+[32m+[m[32m        "candidate_k": 50[m[41m[m
+src/api/rest_service.py:62: trailing whitespace.
+[32m+[m[32m    }[m[41m[m
+src/api/rest_service.py:63: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:64: trailing whitespace.
+[32m+[m[32mBeispiel-Request (mehrere Kombinationen, wie im Grid-Skript):[m[41m[m
+src/api/rest_service.py:65: trailing whitespace.
+[32m+[m[32m    POST /evaluate/grid[m[41m[m
+src/api/rest_service.py:66: trailing whitespace.
+[32m+[m[32m    {[m[41m[m
+src/api/rest_service.py:67: trailing whitespace.
+[32m+[m[32m        "bases": ["bm25", "rrf", "alpha"],[m[41m[m
+src/api/rest_service.py:68: trailing whitespace.
+[32m+[m[32m        "k": 10[m[41m[m
+src/api/rest_service.py:69: trailing whitespace.
+[32m+[m[32m    }[m[41m[m
+src/api/rest_service.py:70: trailing whitespace.
+[32m+[m[32m"""[m[41m[m
+src/api/rest_service.py:71: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:72: trailing whitespace.
+[32m+[m[32mimport itertools[m[41m[m
+src/api/rest_service.py:73: trailing whitespace.
+[32m+[m[32mimport json[m[41m[m
+src/api/rest_service.py:74: trailing whitespace.
+[32m+[m[32mimport logging[m[41m[m
+src/api/rest_service.py:75: trailing whitespace.
+[32m+[m[32mimport os[m[41m[m
+src/api/rest_service.py:76: trailing whitespace.
+[32m+[m[32mimport re[m[41m[m
+src/api/rest_service.py:77: trailing whitespace.
+[32m+[m[32mimport threading[m[41m[m
+src/api/rest_service.py:78: trailing whitespace.
+[32m+[m[32mimport time[m[41m[m
+src/api/rest_service.py:79: trailing whitespace.
+[32m+[m[32mfrom pathlib import Path[m[41m[m
+src/api/rest_service.py:80: trailing whitespace.
+[32m+[m[32mfrom typing import Any, Dict, List, Literal, Optional[m[41m[m
+src/api/rest_service.py:81: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:82: trailing whitespace.
+[32m+[m[32mimport numpy as np[m[41m[m
+src/api/rest_service.py:83: trailing whitespace.
+[32m+[m[32mimport pgeocode[m[41m[m
+src/api/rest_service.py:84: trailing whitespace.
+[32m+[m[32mimport psycopg[m[41m[m
+src/api/rest_service.py:85: trailing whitespace.
+[32m+[m[32mfrom fastapi import Body, FastAPI, HTTPException, Request[m[41m[m
+src/api/rest_service.py:86: trailing whitespace.
+[32m+[m[32mfrom pydantic import BaseModel, Field[m[41m[m
+src/api/rest_service.py:87: trailing whitespace.
+[32m+[m[32mfrom datetime import datetime[m[41m[m
+src/api/rest_service.py:88: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:89: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.bm25_retrieval import BM25Retriever[m[41m[m
+src/api/rest_service.py:90: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.dense_retrieval import DenseRetriever[m[41m[m
+src/api/rest_service.py:91: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.hybrid_fusion import HybridFusionRetriever[m[41m[m
+src/api/rest_service.py:92: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.cross_encoder_reranker import CrossEncoderReranker[m[41m[m
+src/api/rest_service.py:93: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.query_expansion import QueryExpander[m[41m[m
+src/api/rest_service.py:94: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.query_embedding_cache import QueryEmbeddingCache[m[41m[m
+src/api/rest_service.py:95: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.xgb_fusion_retriever import XGBFusionRetriever[m[41m[m
+src/api/rest_service.py:96: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.spell_correction import SpellCorrector[m[41m[m
+src/api/rest_service.py:97: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.abbreviation_expansion import AbbreviationExpander[m[41m[m
+src/api/rest_service.py:98: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.spelling_variants import SpellingVariantNormalizer[m[41m[m
+src/api/rest_service.py:99: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.behoerden_normalizer import BehoerdenNormalizer[m[41m[m
+src/api/rest_service.py:100: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.compound_splitter import CompoundSplitter[m[41m[m
+src/api/rest_service.py:101: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:102: trailing whitespace.
+[32m+[m[32mfrom src.retrieval.pipeline import ([m[41m[m
+src/api/rest_service.py:103: trailing whitespace.
+[32m+[m[32m    BM25Scorer,[m[41m[m
+src/api/rest_service.py:104: trailing whitespace.
+[32m+[m[32m    DenseScorer,[m[41m[m
+src/api/rest_service.py:105: trailing whitespace.
+[32m+[m[32m    RRFScorer,[m[41m[m
+src/api/rest_service.py:106: trailing whitespace.
+[32m+[m[32m    AlphaFusionScorer,[m[41m[m
+src/api/rest_service.py:107: trailing whitespace.
+[32m+[m[32m    XGBScorer,[m[41m[m
+src/api/rest_service.py:108: trailing whitespace.
+[32m+[m[32m    ComponentPipeline,[m[41m[m
+src/api/rest_service.py:109: trailing whitespace.
+[32m+[m[32m)[m[41m[m
+src/api/rest_service.py:110: trailing whitespace.
+[32m+[m[32mfrom src.rerank.xgb_fusion import XGBFusionModel[m[41m[m
+src/api/rest_service.py:111: trailing whitespace.
+[32m+[m[32mfrom src.api.interamt_data import fetch_and_store_corpus[m[41m[m
+src/api/rest_service.py:112: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:113: trailing whitespace.
+[32m+[m[32mlogger = logging.getLogger("rest_service")[m[41m[m
+src/api/rest_service.py:114: trailing whitespace.
+[32m+[m[32mlogging.basicConfig(level=logging.INFO)[m[41m[m
+src/api/rest_service.py:115: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:116: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:117: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:118: trailing whitespace.
+[32m+[m[32m# KONFIGURATION[m[41m[m
+src/api/rest_service.py:119: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:120: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:121: trailing whitespace.
+[32m+[m[32mDATASET_DIR = Path("data/processed/jobs_interamt_log_queries")[m[41m[m
+src/api/rest_service.py:122: trailing whitespace.
+[32m+[m[32mCORPUS_PATH = Path(os.getenv("INTERAMT_CORPUS_PATH", "runtime-data/corpus.jsonl"))[m[41m[m
+src/api/rest_service.py:123: trailing whitespace.
+[32m+[m[32mQUERIES_PATH = DATASET_DIR / "queries.jsonl"[m[41m[m
+src/api/rest_service.py:124: trailing whitespace.
+[32m+[m[32mQRELS_PATH = DATASET_DIR / "qrels" / "test.tsv"[m[41m[m
+src/api/rest_service.py:125: trailing whitespace.
+[32m+[m[32mXGB_MODEL_PATH = Path("models/xgb_fusion.json")[m[41m[m
+src/api/rest_service.py:126: trailing whitespace.
+[32m+[m[32mEMBEDDING_DATABASE_URL = os.getenv([m[41m[m
+src/api/rest_service.py:127: trailing whitespace.
+[32m+[m[32m    "EMBEDDING_DATABASE_URL",[m[41m[m
+src/api/rest_service.py:128: trailing whitespace.
+[32m+[m[32m    "postgresql://ai_suche:ai_suche@localhost:5432/ai_suche",[m[41m[m
+src/api/rest_service.py:129: trailing whitespace.
+[32m+[m[32m)[m[41m[m
+src/api/rest_service.py:130: trailing whitespace.
+[32m+[m[32mAI_SUCH_ROLE = os.getenv("AI_SUCH_ROLE", "master").strip().lower()[m[41m[m
+src/api/rest_service.py:131: trailing whitespace.
+[32m+[m[32mif AI_SUCH_ROLE not in {"master", "worker"}:[m[41m[m
+src/api/rest_service.py:132: trailing whitespace.
+[32m+[m[32m    raise RuntimeError("AI_SUCH_ROLE muss 'master' oder 'worker' sein.")[m[41m[m
+src/api/rest_service.py:133: trailing whitespace.
+[32m+[m[32mREAD_ONLY_WORKER = AI_SUCH_ROLE == "worker"[m[41m[m
+src/api/rest_service.py:134: trailing whitespace.
+[32m+[m[32mABBREVIATION_CONFIG_PATH = Path("config/abbreviations.json")[m[41m[m
+src/api/rest_service.py:135: trailing whitespace.
+[32m+[m[32mVARIANT_CONFIG_PATH = Path("config/spelling_variants.json")[m[41m[m
+src/api/rest_service.py:136: trailing whitespace.
+[32m+[m[32mBEHOERDEN_CONFIG_PATH = Path("config/behoerdensprache.json")[m[41m[m
+src/api/rest_service.py:137: trailing whitespace.
+[32m+[m[32mCOMPOUND_DICT_PATH = Path("config/compound_dictionary.json")[m[41m[m
+src/api/rest_service.py:138: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:139: trailing whitespace.
+[32m+[m[32m# Seit der Erweiterung von transform_dtag_to_beir.py schreibt corpus.jsonl[m[41m[m
+src/api/rest_service.py:140: trailing whitespace.
+[32m+[m[32m# diese Felder als echte JSON-Keys (zusätzlich zum unveränderten "text").[m[41m[m
+src/api/rest_service.py:141: trailing whitespace.
+[32m+[m[32m# Für ältere/nicht neu generierte corpus.jsonl-Dateien (nur "_id"/"title"/[m[41m[m
+src/api/rest_service.py:142: trailing whitespace.
+[32m+[m[32m# "text") greift automatisch der Fallback über parse_preamble() weiter unten.[m[41m[m
+src/api/rest_service.py:143: trailing whitespace.
+[32m+[m[32mFIELD_DIENSTVERHAELTNIS = "dienstverhaeltnis"  # Liste von Labels, z.B. ["Beamter"], ["Angestellter"][m[41m[m
+src/api/rest_service.py:144: trailing whitespace.
+[32m+[m[32mFIELD_BEREICH = "bereich"                      # Liste, aus aufgabenbereich[][m[41m[m
+src/api/rest_service.py:145: trailing whitespace.
+[32m+[m[32mFIELD_BESCHAEFTIGUNGSDAUER = "beschaeftigungsdauer"[m[41m[m
+src/api/rest_service.py:146: trailing whitespace.
+[32m+[m[32mFIELD_BESCHAEFTIGUNGSART = "beschaeftigungsart"  # "Vollzeit" / "Teilzeit" / "Vollzeit oder Teilzeit"[m[41m[m
+src/api/rest_service.py:147: trailing whitespace.
+[32m+[m[32mFIELD_DIENSTORT = "dienstort"    # primärer Ortsname (erster Einsatzort)[m[41m[m
+src/api/rest_service.py:148: trailing whitespace.
+[32m+[m[32mFIELD_BUNDESLAND = "bundesland"[m[41m[m
+src/api/rest_service.py:149: trailing whitespace.
+[32m+[m[32mFIELD_EINSATZORTE = "einsatzorte"  # Liste von {ort, bundesland, plz, latitude, longitude}[m[41m[m
+src/api/rest_service.py:150: trailing whitespace.
+[32m+[m[32mFIELD_DIENSTSTELLE = "dienststelle"[m[41m[m
+src/api/rest_service.py:151: trailing whitespace.
+[32m+[m[32mFIELD_URL = "url"[m[41m[m
+src/api/rest_service.py:152: trailing whitespace.
+[32m+[m[32mFIELD_KENNUNG = "kennung"[m[41m[m
+src/api/rest_service.py:153: trailing whitespace.
+[32m+[m[32mFIELD_VEROEFFENTLICHT_AM = "veroeffentlicht_am"[m[41m[m
+src/api/rest_service.py:154: trailing whitespace.
+[32m+[m[32mFIELD_BEWERBUNGSFRIST = "bewerbungsfrist"[m[41m[m
+src/api/rest_service.py:155: trailing whitespace.
+[32m+[m[32mFIELD_BEWERBUNGSPROZESS = "bewerbungsprozess"[m[41m[m
+src/api/rest_service.py:156: trailing whitespace.
+[32m+[m[32mFIELD_ANZAHL_POSTEN = "anzahl_posten"[m[41m[m
+src/api/rest_service.py:157: trailing whitespace.
+[32m+[m[32mFIELD_TEXT = "text"[m[41m[m
+src/api/rest_service.py:158: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:159: trailing whitespace.
+[32m+[m[32mSNIPPET_MAX_CHARS = 280[m[41m[m
+src/api/rest_service.py:160: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:161: trailing whitespace.
+[32m+[m[32m# Labels der strukturierten Präambel am Anfang jedes "text"-Feldes -- nur[m[41m[m
+src/api/rest_service.py:162: trailing whitespace.
+[32m+[m[32m# noch als Fallback relevant, falls corpus.jsonl (noch) keine eigenen[m[41m[m
+src/api/rest_service.py:163: trailing whitespace.
+[32m+[m[32m# JSON-Felder für obige FIELD_*-Konstanten hat.[m[41m[m
+src/api/rest_service.py:164: trailing whitespace.
+[32m+[m[32mPREAMBLE_LABELS = ["Stelle", "Behörde", "Fachrichtung", "Aufgabenbereich", "Einsatzort", "Beschäftigung"][m[41m[m
+src/api/rest_service.py:165: trailing whitespace.
+[32m+[m[32m_PREAMBLE_LABEL_PATTERN = re.compile(r"\b(" + "|".join(PREAMBLE_LABELS) + r"):\s*([^.]*)\.")[m[41m[m
+src/api/rest_service.py:166: trailing whitespace.
+[32m+[m[32m# Nach dieser Zeichen-Position im Text brechen wir das Präambel-Parsing ab,[m[41m[m
+src/api/rest_service.py:167: trailing whitespace.
+[32m+[m[32m# um kein "Behörde:"/"Einsatzort:" aus dem freien Fließtext aufzuschnappen.[m[41m[m
+src/api/rest_service.py:168: trailing whitespace.
+[32m+[m[32m_PREAMBLE_SEARCH_LIMIT_CHARS = 500[m[41m[m
+src/api/rest_service.py:169: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:170: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:171: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:172: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:173: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:174: trailing whitespace.
+[32m+[m[32m# DATEN-MODELLE (Request / Response)[m[41m[m
+src/api/rest_service.py:175: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:176: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:177: trailing whitespace.
+[32m+[m[32mclass SearchFilters(BaseModel):[m[41m[m
+src/api/rest_service.py:178: trailing whitespace.
+[32m+[m[32m    plz_oder_ort: Optional[str] = Field([m[41m[m
+src/api/rest_service.py:179: trailing whitespace.
+[32m+[m[32m        default=None, description="Referenzpunkt für die Entfernungsberechnung, z.B. '18055' oder 'Rostock'"[m[41m[m
+src/api/rest_service.py:180: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:181: trailing whitespace.
+[32m+[m[32m    max_distance_km: Optional[float] = Field([m[41m[m
+src/api/rest_service.py:182: trailing whitespace.
+[32m+[m[32m        default=None, description="Maximale Luftlinien-Entfernung in km (nur wirksam zusammen mit plz_oder_ort)"[m[41m[m
+src/api/rest_service.py:183: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:184: trailing whitespace.
+[32m+[m[32m    dienstverhaeltnis: Optional[List[str]] = None[m[41m[m
+src/api/rest_service.py:185: trailing whitespace.
+[32m+[m[32m    bereich: Optional[List[str]] = None[m[41m[m
+src/api/rest_service.py:186: trailing whitespace.
+[32m+[m[32m    beschaeftigungsdauer: Optional[List[str]] = None[m[41m[m
+src/api/rest_service.py:187: trailing whitespace.
+[32m+[m[32m    dienstort: Optional[List[str]] = None[m[41m[m
+src/api/rest_service.py:188: trailing whitespace.
+[32m+[m[32m    beschaeftigungsart: Optional[Literal["Teilzeit", "Vollzeit"]] = None[m[41m[m
+src/api/rest_service.py:189: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:190: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:191: trailing whitespace.
+[32m+[m[32mclass SearchRequest(BaseModel):[m[41m[m
+src/api/rest_service.py:192: trailing whitespace.
+[32m+[m[32m    query: str[m[41m[m
+src/api/rest_service.py:193: trailing whitespace.
+[32m+[m[32m    top_k: int = 10[m[41m[m
+src/api/rest_service.py:194: trailing whitespace.
+[32m+[m[32m    candidate_k: int = 50[m[41m[m
+src/api/rest_service.py:195: trailing whitespace.
+[32m+[m[32m    filters: Optional[SearchFilters] = None[m[41m[m
+src/api/rest_service.py:196: trailing whitespace.
+[32m+[m[32m    base: Literal["bm25", "dense", "rrf", "alpha", "xgb"] = Field([m[41m[m
+src/api/rest_service.py:197: trailing whitespace.
+[32m+[m[32m        default="bm25",[m[41m[m
+src/api/rest_service.py:198: trailing whitespace.
+[32m+[m[32m        description=([m[41m[m
+src/api/rest_service.py:199: trailing whitespace.
+[32m+[m[32m            "Retrieval-Basis: 'bm25' = Stichwortsuche mit BM25; "[m[41m[m
+src/api/rest_service.py:200: trailing whitespace.
+[32m+[m[32m            "'dense' = semantische Vektorsuche; "[m[41m[m
+src/api/rest_service.py:201: trailing whitespace.
+[32m+[m[32m            "'rrf' = Kombination aus BM25 und Dense mit Reciprocal Rank Fusion; "[m[41m[m
+src/api/rest_service.py:202: trailing whitespace.
+[32m+[m[32m            "'alpha' = gewichtete Kombination aus BM25 und Dense; "[m[41m[m
+src/api/rest_service.py:203: trailing whitespace.
+[32m+[m[32m            "'xgb' = XGBoost-Learning-to-Rank-Fusion."[m[41m[m
+src/api/rest_service.py:204: trailing whitespace.
+[32m+[m[32m        ),[m[41m[m
+src/api/rest_service.py:205: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:206: trailing whitespace.
+[32m+[m[32m    use_qe: bool = False[m[41m[m
+src/api/rest_service.py:207: trailing whitespace.
+[32m+[m[32m    use_kg: bool = Field([m[41m[m
+src/api/rest_service.py:208: trailing whitespace.
+[32m+[m[32m        default=False,[m[41m[m
+src/api/rest_service.py:209: trailing whitespace.
+[32m+[m[32m        description="Veraltet: Knowledge-Graph-Reranking ist in der Produktivkonfiguration deaktiviert.",[m[41m[m
+src/api/rest_service.py:210: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:211: trailing whitespace.
+[32m+[m[32m    use_ce: bool = False[m[41m[m
+src/api/rest_service.py:212: trailing whitespace.
+[32m+[m[32m    normalize_scores: bool = False[m[41m[m
+src/api/rest_service.py:213: trailing whitespace.
+[32m+[m[32m    alpha: float = 0.2[m[41m[m
+src/api/rest_service.py:214: trailing whitespace.
+[32m+[m[32m    sort_by: Literal["relevance", "recency", "distance"] = Field([m[41m[m
+src/api/rest_service.py:215: trailing whitespace.
+[32m+[m[32m        default="relevance",[m[41m[m
+src/api/rest_service.py:216: trailing whitespace.
+[32m+[m[32m        description=([m[41m[m
+src/api/rest_service.py:217: trailing whitespace.
+[32m+[m[32m            "Sortierung der Ergebnisse: 'relevance' (Pipeline-Score, Default), "[m[41m[m
+src/api/rest_service.py:218: trailing whitespace.
+[32m+[m[32m            "'recency' (neueste Veröffentlichung zuerst) oder 'distance' "[m[41m[m
+src/api/rest_service.py:219: trailing whitespace.
+[32m+[m[32m            "(nächstgelegener Einsatzort zuerst — erfordert filters.plz_oder_ort). "[m[41m[m
+src/api/rest_service.py:220: trailing whitespace.
+[32m+[m[32m            "Dokumente ohne Sortierwert (kein Datum / keine auflösbare Distanz) "[m[41m[m
+src/api/rest_service.py:221: trailing whitespace.
+[32m+[m[32m            "landen am Ende statt den Request scheitern zu lassen."[m[41m[m
+src/api/rest_service.py:222: trailing whitespace.
+[32m+[m[32m        ),[m[41m[m
+src/api/rest_service.py:223: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:224: trailing whitespace.
+[32m+[m[32m    correct_spelling: bool = Field([m[41m[m
+src/api/rest_service.py:225: trailing whitespace.
+[32m+[m[32m        default=True, description="Rechtschreibfehler in der Query vor dem Retrieval automatisch korrigieren"[m[41m[m
+src/api/rest_service.py:226: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:227: trailing whitespace.
+[32m+[m[32m    expand_abbreviations: bool = Field([m[41m[m
+src/api/rest_service.py:228: trailing whitespace.
+[32m+[m[32m        default=True,[m[41m[m
+src/api/rest_service.py:229: trailing whitespace.
+[32m+[m[32m        description="Bekannte Abkürzungen (TVöD, m/w/d, SB, IT, ...) erkennen und ausgeschriebene Form ergänzen",[m[41m[m
+src/api/rest_service.py:230: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:231: trailing whitespace.
+[32m+[m[32m    normalize_spelling_variants: bool = Field([m[41m[m
+src/api/rest_service.py:232: trailing whitespace.
+[32m+[m[32m        default=True,[m[41m[m
+src/api/rest_service.py:233: trailing whitespace.
+[32m+[m[32m        description="Schreibvarianten (Gender-Formen, ß/ss, Homeoffice/Home-Office, ...) normalisieren",[m[41m[m
+src/api/rest_service.py:234: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:235: trailing whitespace.
+[32m+[m[32m    normalize_behoerdensprache: bool = Field([m[41m[m
+src/api/rest_service.py:236: trailing whitespace.
+[32m+[m[32m        default=True,[m[41m[m
+src/api/rest_service.py:237: trailing whitespace.
+[32m+[m[32m        description="Amtsdeutsch-Begriffe (Tätigkeitsmerkmale, Sachbearbeitung, ...) um Klartext-Synonyme ergänzen und umgekehrt",[m[41m[m
+src/api/rest_service.py:238: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:239: trailing whitespace.
+[32m+[m[32m    split_compounds: bool = True[m[41m[m
+src/api/rest_service.py:240: trailing whitespace.
+[32m+[m[32m    include_document_details: bool = Field([m[41m[m
+src/api/rest_service.py:241: trailing whitespace.
+[32m+[m[32m        default=True,[m[41m[m
+src/api/rest_service.py:242: trailing whitespace.
+[32m+[m[32m        description="Zusätzliche Dokument-Metadaten (Dienststelle, Bereich, Dienstort, Bewerbungsfrist, Snippet, ...) in den Ergebnissen mitliefern",[m[41m[m
+src/api/rest_service.py:243: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:244: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:245: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:246: trailing whitespace.
+[32m+[m[32mclass DocumentDetails(BaseModel):[m[41m[m
+src/api/rest_service.py:247: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:248: trailing whitespace.
+[32m+[m[32m    Zusätzliche Metadaten zu einem Treffer. Kommen primär aus den echten[m[41m[m
+src/api/rest_service.py:249: trailing whitespace.
+[32m+[m[32m    JSON-Feldern in corpus.jsonl (seit der Erweiterung von[m[41m[m
+src/api/rest_service.py:250: trailing whitespace.
+[32m+[m[32m    transform_dtag_to_beir.py); für ältere corpus.jsonl-Dateien ohne diese[m[41m[m
+src/api/rest_service.py:251: trailing whitespace.
+[32m+[m[32m    Felder greift ein Fallback über die Text-Präambel (siehe parse_preamble).[m[41m[m
+src/api/rest_service.py:252: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:253: trailing whitespace.
+[32m+[m[32m    dienstverhaeltnis: Optional[List[str]] = None[m[41m[m
+src/api/rest_service.py:254: trailing whitespace.
+[32m+[m[32m    bereich: Optional[List[str]] = None[m[41m[m
+src/api/rest_service.py:255: trailing whitespace.
+[32m+[m[32m    fachrichtung: Optional[str] = None[m[41m[m
+src/api/rest_service.py:256: trailing whitespace.
+[32m+[m[32m    beschaeftigungsart: Optional[str] = None[m[41m[m
+src/api/rest_service.py:257: trailing whitespace.
+[32m+[m[32m    beschaeftigungsdauer: Optional[Any] = None[m[41m[m
+src/api/rest_service.py:258: trailing whitespace.
+[32m+[m[32m    dienstort: Optional[str] = None[m[41m[m
+src/api/rest_service.py:259: trailing whitespace.
+[32m+[m[32m    bundesland: Optional[str] = None[m[41m[m
+src/api/rest_service.py:260: trailing whitespace.
+[32m+[m[32m    einsatzorte: Optional[List[str]] = None[m[41m[m
+src/api/rest_service.py:261: trailing whitespace.
+[32m+[m[32m    dienststelle: Optional[str] = None[m[41m[m
+src/api/rest_service.py:262: trailing whitespace.
+[32m+[m[32m    url: Optional[str] = None[m[41m[m
+src/api/rest_service.py:263: trailing whitespace.
+[32m+[m[32m    kennung: Optional[str] = None[m[41m[m
+src/api/rest_service.py:264: trailing whitespace.
+[32m+[m[32m    veroeffentlicht_am: Optional[str] = None[m[41m[m
+src/api/rest_service.py:265: trailing whitespace.
+[32m+[m[32m    bewerbungsfrist: Optional[str] = None[m[41m[m
+src/api/rest_service.py:266: trailing whitespace.
+[32m+[m[32m    bewerbungsprozess: Optional[str] = None[m[41m[m
+src/api/rest_service.py:267: trailing whitespace.
+[32m+[m[32m    anzahl_posten: Optional[int] = None[m[41m[m
+src/api/rest_service.py:268: trailing whitespace.
+[32m+[m[32m    snippet: Optional[str] = None[m[41m[m
+src/api/rest_service.py:269: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:270: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:271: trailing whitespace.
+[32m+[m[32mclass SearchResultItem(BaseModel):[m[41m[m
+src/api/rest_service.py:272: trailing whitespace.
+[32m+[m[32m    doc_id: str[m[41m[m
+src/api/rest_service.py:273: trailing whitespace.
+[32m+[m[32m    title: Optional[str] = None[m[41m[m
+src/api/rest_service.py:274: trailing whitespace.
+[32m+[m[32m    score: float[m[41m[m
+src/api/rest_service.py:275: trailing whitespace.
+[32m+[m[32m    distance_km: Optional[float] = None[m[41m[m
+src/api/rest_service.py:276: trailing whitespace.
+[32m+[m[32m    details: Optional[DocumentDetails] = None[m[41m[m
+src/api/rest_service.py:277: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:278: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:279: trailing whitespace.
+[32m+[m[32mclass QueryPreprocessingStep(BaseModel):[m[41m[m
+src/api/rest_service.py:280: trailing whitespace.
+[32m+[m[32m    step: str[m[41m[m
+src/api/rest_service.py:281: trailing whitespace.
+[32m+[m[32m    result: str[m[41m[m
+src/api/rest_service.py:282: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:283: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:284: trailing whitespace.
+[32m+[m[32mclass SearchResponse(BaseModel):[m[41m[m
+src/api/rest_service.py:285: trailing whitespace.
+[32m+[m[32m    query: str[m[41m[m
+src/api/rest_service.py:286: trailing whitespace.
+[32m+[m[32m    base: str[m[41m[m
+src/api/rest_service.py:287: trailing whitespace.
+[32m+[m[32m    num_candidates_after_filter: Optional[int] = None[m[41m[m
+src/api/rest_service.py:288: trailing whitespace.
+[32m+[m[32m    results: List[SearchResultItem][m[41m[m
+src/api/rest_service.py:289: trailing whitespace.
+[32m+[m[32m    final_query: str[m[41m[m
+src/api/rest_service.py:290: trailing whitespace.
+[32m+[m[32m    preprocessing_applied: List[QueryPreprocessingStep] = Field(default_factory=list)[m[41m[m
+src/api/rest_service.py:291: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:292: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:293: trailing whitespace.
+[32m+[m[32mclass ReloadResponse(BaseModel):[m[41m[m
+src/api/rest_service.py:294: trailing whitespace.
+[32m+[m[32m    status: str[m[41m[m
+src/api/rest_service.py:295: trailing whitespace.
+[32m+[m[32m    num_documents: int[m[41m[m
+src/api/rest_service.py:296: trailing whitespace.
+[32m+[m[32m    duration_seconds: float[m[41m[m
+src/api/rest_service.py:297: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:298: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:299: trailing whitespace.
+[32m+[m[32mclass ServiceStatusResponse(BaseModel):[m[41m[m
+src/api/rest_service.py:300: trailing whitespace.
+[32m+[m[32m    status: str[m[41m[m
+src/api/rest_service.py:301: trailing whitespace.
+[32m+[m[32m    pipeline_ready: bool[m[41m[m
+src/api/rest_service.py:302: trailing whitespace.
+[32m+[m[32m    database: Dict[str, Any][m[41m[m
+src/api/rest_service.py:303: trailing whitespace.
+[32m+[m[32m    num_documents: int[m[41m[m
+src/api/rest_service.py:304: trailing whitespace.
+[32m+[m[32m    components: Dict[str, bool][m[41m[m
+src/api/rest_service.py:305: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:306: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:307: trailing whitespace.
+[32m+[m[32mclass EvaluateRequest(BaseModel):[m[41m[m
+src/api/rest_service.py:308: trailing whitespace.
+[32m+[m[32m    base: Literal["bm25", "dense", "rrf", "alpha", "xgb"] = Field([m[41m[m
+src/api/rest_service.py:309: trailing whitespace.
+[32m+[m[32m        default="bm25",[m[41m[m
+src/api/rest_service.py:310: trailing whitespace.
+[32m+[m[32m        description=([m[41m[m
+src/api/rest_service.py:311: trailing whitespace.
+[32m+[m[32m            "Zu evaluierende Retrieval-Basis: 'bm25' (Stichwortsuche), "[m[41m[m
+src/api/rest_service.py:312: trailing whitespace.
+[32m+[m[32m            "'dense' (semantische Vektorsuche), 'rrf' (BM25 + Dense via "[m[41m[m
+src/api/rest_service.py:313: trailing whitespace.
+[32m+[m[32m            "Reciprocal Rank Fusion), 'alpha' (gewichtete BM25/Dense-Fusion) "[m[41m[m
+src/api/rest_service.py:314: trailing whitespace.
+[32m+[m[32m            "oder 'xgb' (XGBoost-Learning-to-Rank-Fusion)."[m[41m[m
+src/api/rest_service.py:315: trailing whitespace.
+[32m+[m[32m        ),[m[41m[m
+src/api/rest_service.py:316: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:317: trailing whitespace.
+[32m+[m[32m    use_qe: bool = False[m[41m[m
+src/api/rest_service.py:318: trailing whitespace.
+[32m+[m[32m    use_kg: bool = Field([m[41m[m
+src/api/rest_service.py:319: trailing whitespace.
+[32m+[m[32m        default=False,[m[41m[m
+src/api/rest_service.py:320: trailing whitespace.
+[32m+[m[32m        description="Veraltet: Knowledge-Graph-Reranking ist in der Produktivkonfiguration deaktiviert.",[m[41m[m
+src/api/rest_service.py:321: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:322: trailing whitespace.
+[32m+[m[32m    use_ce: bool = False[m[41m[m
+src/api/rest_service.py:323: trailing whitespace.
+[32m+[m[32m    k: int = 10[m[41m[m
+src/api/rest_service.py:324: trailing whitespace.
+[32m+[m[32m    candidate_k: int = 50[m[41m[m
+src/api/rest_service.py:325: trailing whitespace.
+[32m+[m[32m    normalize_scores: bool = False[m[41m[m
+src/api/rest_service.py:326: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:327: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:328: trailing whitespace.
+[32m+[m[32mclass EvaluateResponse(BaseModel):[m[41m[m
+src/api/rest_service.py:329: trailing whitespace.
+[32m+[m[32m    model: str[m[41m[m
+src/api/rest_service.py:330: trailing whitespace.
+[32m+[m[32m    num_queries: int[m[41m[m
+src/api/rest_service.py:331: trailing whitespace.
+[32m+[m[32m    metrics: Dict[str, float][m[41m[m
+src/api/rest_service.py:332: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:333: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:334: trailing whitespace.
+[32m+[m[32mclass EvaluateGridRequest(BaseModel):[m[41m[m
+src/api/rest_service.py:335: trailing whitespace.
+[32m+[m[32m    bases: List[Literal["bm25", "dense", "rrf", "alpha", "xgb"]] = Field([m[41m[m
+src/api/rest_service.py:336: trailing whitespace.
+[32m+[m[32m        default_factory=lambda: ["bm25", "dense", "rrf", "alpha"],[m[41m[m
+src/api/rest_service.py:337: trailing whitespace.
+[32m+[m[32m        description=([m[41m[m
+src/api/rest_service.py:338: trailing whitespace.
+[32m+[m[32m            "Retrieval-Basen, die im Grid verglichen werden: 'bm25' (Stichwortsuche), "[m[41m[m
+src/api/rest_service.py:339: trailing whitespace.
+[32m+[m[32m            "'dense' (semantische Vektorsuche), 'rrf' (BM25 + Dense via Reciprocal "[m[41m[m
+src/api/rest_service.py:340: trailing whitespace.
+[32m+[m[32m            "Rank Fusion), 'alpha' (gewichtete BM25/Dense-Fusion) und 'xgb' "[m[41m[m
+src/api/rest_service.py:341: trailing whitespace.
+[32m+[m[32m            "(XGBoost-Learning-to-Rank-Fusion)."[m[41m[m
+src/api/rest_service.py:342: trailing whitespace.
+[32m+[m[32m        ),[m[41m[m
+src/api/rest_service.py:343: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:344: trailing whitespace.
+[32m+[m[32m    skip_qe: bool = False[m[41m[m
+src/api/rest_service.py:345: trailing whitespace.
+[32m+[m[32m    skip_kg: bool = False[m[41m[m
+src/api/rest_service.py:346: trailing whitespace.
+[32m+[m[32m    skip_ce: bool = False[m[41m[m
+src/api/rest_service.py:347: trailing whitespace.
+[32m+[m[32m    k: int = 10[m[41m[m
+src/api/rest_service.py:348: trailing whitespace.
+[32m+[m[32m    candidate_k: int = 50[m[41m[m
+src/api/rest_service.py:349: trailing whitespace.
+[32m+[m[32m    normalize_scores: bool = False[m[41m[m
+src/api/rest_service.py:350: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:351: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:352: trailing whitespace.
+[32m+[m[32mclass EvaluateGridResultItem(BaseModel):[m[41m[m
+src/api/rest_service.py:353: trailing whitespace.
+[32m+[m[32m    model: str[m[41m[m
+src/api/rest_service.py:354: trailing whitespace.
+[32m+[m[32m    metrics: Dict[str, float][m[41m[m
+src/api/rest_service.py:355: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:356: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:357: trailing whitespace.
+[32m+[m[32mclass EvaluateGridResponse(BaseModel):[m[41m[m
+src/api/rest_service.py:358: trailing whitespace.
+[32m+[m[32m    num_queries: int[m[41m[m
+src/api/rest_service.py:359: trailing whitespace.
+[32m+[m[32m    num_combinations: int[m[41m[m
+src/api/rest_service.py:360: trailing whitespace.
+[32m+[m[32m    results: List[EvaluateGridResultItem][m[41m[m
+src/api/rest_service.py:361: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:362: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:363: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:364: trailing whitespace.
+[32m+[m[32m# GEO-HILFSFUNKTIONEN (PLZ/Ort -> Koordinaten, Distanz)[m[41m[m
+src/api/rest_service.py:365: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:366: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:367: trailing whitespace.
+[32m+[m[32m_nomi = pgeocode.Nominatim("de")[m[41m[m
+src/api/rest_service.py:368: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:369: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:370: trailing whitespace.
+[32m+[m[32mdef resolve_to_latlon(value: str) -> Optional[tuple]:[m[41m[m
+src/api/rest_service.py:371: trailing whitespace.
+[32m+[m[32m    """Löst eine 5-stellige PLZ oder einen Ortsnamen zu (lat, lon) auf."""[m[41m[m
+src/api/rest_service.py:372: trailing whitespace.
+[32m+[m[32m    value = value.strip()[m[41m[m
+src/api/rest_service.py:373: trailing whitespace.
+[32m+[m[32m    if not value:[m[41m[m
+src/api/rest_service.py:374: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:375: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:376: trailing whitespace.
+[32m+[m[32m    if value.isdigit() and len(value) == 5:[m[41m[m
+src/api/rest_service.py:377: trailing whitespace.
+[32m+[m[32m        rec = _nomi.query_postal_code(value)[m[41m[m
+src/api/rest_service.py:378: trailing whitespace.
+[32m+[m[32m        if rec is None or np.isnan(rec.latitude):[m[41m[m
+src/api/rest_service.py:379: trailing whitespace.
+[32m+[m[32m            return None[m[41m[m
+src/api/rest_service.py:380: trailing whitespace.
+[32m+[m[32m        return float(rec.latitude), float(rec.longitude)[m[41m[m
+src/api/rest_service.py:381: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:382: trailing whitespace.
+[32m+[m[32m    df = _nomi._data[m[41m[m
+src/api/rest_service.py:383: trailing whitespace.
+[32m+[m[32m    match = df[df["place_name"].str.lower() == value.lower()][m[41m[m
+src/api/rest_service.py:384: trailing whitespace.
+[32m+[m[32m    if match.empty:[m[41m[m
+src/api/rest_service.py:385: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:386: trailing whitespace.
+[32m+[m[32m    rec = match.iloc[0][m[41m[m
+src/api/rest_service.py:387: trailing whitespace.
+[32m+[m[32m    if np.isnan(rec.latitude):[m[41m[m
+src/api/rest_service.py:388: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:389: trailing whitespace.
+[32m+[m[32m    return float(rec.latitude), float(rec.longitude)[m[41m[m
+src/api/rest_service.py:390: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:391: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:392: trailing whitespace.
+[32m+[m[32mdef haversine_km(lat1: float, lon1: float, lat2_arr: np.ndarray, lon2_arr: np.ndarray) -> np.ndarray:[m[41m[m
+src/api/rest_service.py:393: trailing whitespace.
+[32m+[m[32m    """Vektorisierte Haversine-Distanz in km."""[m[41m[m
+src/api/rest_service.py:394: trailing whitespace.
+[32m+[m[32m    R = 6371.0[m[41m[m
+src/api/rest_service.py:395: trailing whitespace.
+[32m+[m[32m    lat1_r, lon1_r = np.radians(lat1), np.radians(lon1)[m[41m[m
+src/api/rest_service.py:396: trailing whitespace.
+[32m+[m[32m    lat2_r, lon2_r = np.radians(lat2_arr), np.radians(lon2_arr)[m[41m[m
+src/api/rest_service.py:397: trailing whitespace.
+[32m+[m[32m    dlat = lat2_r - lat1_r[m[41m[m
+src/api/rest_service.py:398: trailing whitespace.
+[32m+[m[32m    dlon = lon2_r - lon1_r[m[41m[m
+src/api/rest_service.py:399: trailing whitespace.
+[32m+[m[32m    a = np.sin(dlat / 2) ** 2 + np.cos(lat1_r) * np.cos(lat2_r) * np.sin(dlon / 2) ** 2[m[41m[m
+src/api/rest_service.py:400: trailing whitespace.
+[32m+[m[32m    return R * 2 * np.arcsin(np.sqrt(a))[m[41m[m
+src/api/rest_service.py:401: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:402: trailing whitespace.
+[32m+[m[32m_VEROEFFENTLICHT_AM_FORMATS = ("%Y-%m-%d", "%d.%m.%Y", "%Y-%m-%dT%H:%M:%S")[m[41m[m
+src/api/rest_service.py:403: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:404: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:405: trailing whitespace.
+[32m+[m[32mdef _parse_veroeffentlicht_am(raw: Optional[str]) -> Optional[datetime]:[m[41m[m
+src/api/rest_service.py:406: trailing whitespace.
+[32m+[m[32m    """Robustes Parsing für veroeffentlicht_am -- Format aus der Interamt-API ist nicht 100% garantiert."""[m[41m[m
+src/api/rest_service.py:407: trailing whitespace.
+[32m+[m[32m    if not raw or not isinstance(raw, str):[m[41m[m
+src/api/rest_service.py:408: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:409: trailing whitespace.
+[32m+[m[32m    raw = raw.strip()[m[41m[m
+src/api/rest_service.py:410: trailing whitespace.
+[32m+[m[32m    for fmt in _VEROEFFENTLICHT_AM_FORMATS:[m[41m[m
+src/api/rest_service.py:411: trailing whitespace.
+[32m+[m[32m        try:[m[41m[m
+src/api/rest_service.py:412: trailing whitespace.
+[32m+[m[32m            return datetime.strptime(raw, fmt)[m[41m[m
+src/api/rest_service.py:413: trailing whitespace.
+[32m+[m[32m        except ValueError:[m[41m[m
+src/api/rest_service.py:414: trailing whitespace.
+[32m+[m[32m            continue[m[41m[m
+src/api/rest_service.py:415: trailing whitespace.
+[32m+[m[32m    return None[m[41m[m
+src/api/rest_service.py:416: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:417: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:418: trailing whitespace.
+[32m+[m[32mdef _compute_min_distances_km([m[41m[m
+src/api/rest_service.py:419: trailing whitespace.
+[32m+[m[32m    ref_lat: float,[m[41m[m
+src/api/rest_service.py:420: trailing whitespace.
+[32m+[m[32m    ref_lon: float,[m[41m[m
+src/api/rest_service.py:421: trailing whitespace.
+[32m+[m[32m    doc_lats: np.ndarray,[m[41m[m
+src/api/rest_service.py:422: trailing whitespace.
+[32m+[m[32m    doc_lons: np.ndarray,[m[41m[m
+src/api/rest_service.py:423: trailing whitespace.
+[32m+[m[32m    doc_ids_with_geo: List[str],[m[41m[m
+src/api/rest_service.py:424: trailing whitespace.
+[32m+[m[32m) -> Dict[str, float]:[m[41m[m
+src/api/rest_service.py:425: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:426: trailing whitespace.
+[32m+[m[32m    Minimale Distanz je doc_id zum Referenzpunkt. Ein Job kann mehrere[m[41m[m
+src/api/rest_service.py:427: trailing whitespace.
+[32m+[m[32m    Einsatzorte (= mehrere Einträge im Geo-Cache) haben -- hier zählt[m[41m[m
+src/api/rest_service.py:428: trailing whitespace.
+[32m+[m[32m    jeweils der nächstgelegene.[m[41m[m
+src/api/rest_service.py:429: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:430: trailing whitespace.
+[32m+[m[32m    if len(doc_ids_with_geo) == 0:[m[41m[m
+src/api/rest_service.py:431: trailing whitespace.
+[32m+[m[32m        return {}[m[41m[m
+src/api/rest_service.py:432: trailing whitespace.
+[32m+[m[32m    dists = haversine_km(ref_lat, ref_lon, doc_lats, doc_lons)[m[41m[m
+src/api/rest_service.py:433: trailing whitespace.
+[32m+[m[32m    min_dist: Dict[str, float] = {}[m[41m[m
+src/api/rest_service.py:434: trailing whitespace.
+[32m+[m[32m    for doc_id, d in zip(doc_ids_with_geo, dists):[m[41m[m
+src/api/rest_service.py:435: trailing whitespace.
+[32m+[m[32m        d = float(d)[m[41m[m
+src/api/rest_service.py:436: trailing whitespace.
+[32m+[m[32m        if doc_id not in min_dist or d < min_dist[doc_id]:[m[41m[m
+src/api/rest_service.py:437: trailing whitespace.
+[32m+[m[32m            min_dist[doc_id] = d[m[41m[m
+src/api/rest_service.py:438: trailing whitespace.
+[32m+[m[32m    return min_dist[m[41m[m
+src/api/rest_service.py:439: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:440: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:441: trailing whitespace.
+[32m+[m[32mdef _sort_results(results: List[SearchResultItem], sort_by: str, corpus: dict) -> List[SearchResultItem]:[m[41m[m
+src/api/rest_service.py:442: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:443: trailing whitespace.
+[32m+[m[32m    Sortiert die (bereits nach Pipeline-Score geordneten) Ergebnisse ggf. um.[m[41m[m
+src/api/rest_service.py:444: trailing whitespace.
+[32m+[m[32m    'relevance' lässt die Reihenfolge unverändert -- Score-Ranking bleibt[m[41m[m
+src/api/rest_service.py:445: trailing whitespace.
+[32m+[m[32m    Aufgabe der Pipeline. Dokumente ohne den jeweiligen Sortierwert[m[41m[m
+src/api/rest_service.py:446: trailing whitespace.
+[32m+[m[32m    rutschen ans Ende, statt den Request scheitern zu lassen.[m[41m[m
+src/api/rest_service.py:447: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:448: trailing whitespace.
+[32m+[m[32m    if sort_by == "relevance":[m[41m[m
+src/api/rest_service.py:449: trailing whitespace.
+[32m+[m[32m        return results[m[41m[m
+src/api/rest_service.py:450: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:451: trailing whitespace.
+[32m+[m[32m    if sort_by == "recency":[m[41m[m
+src/api/rest_service.py:452: trailing whitespace.
+[32m+[m[32m        def _key(item: SearchResultItem):[m[41m[m
+src/api/rest_service.py:453: trailing whitespace.
+[32m+[m[32m            dt = _parse_veroeffentlicht_am(corpus.get(item.doc_id, {}).get(FIELD_VEROEFFENTLICHT_AM))[m[41m[m
+src/api/rest_service.py:454: trailing whitespace.
+[32m+[m[32m            # (kein Datum -> ans Ende), sonst neuestes zuerst[m[41m[m
+src/api/rest_service.py:455: trailing whitespace.
+[32m+[m[32m            return (dt is None, -dt.timestamp() if dt else 0.0)[m[41m[m
+src/api/rest_service.py:456: trailing whitespace.
+[32m+[m[32m        return sorted(results, key=_key)[m[41m[m
+src/api/rest_service.py:457: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:458: trailing whitespace.
+[32m+[m[32m    if sort_by == "distance":[m[41m[m
+src/api/rest_service.py:459: trailing whitespace.
+[32m+[m[32m        def _key(item: SearchResultItem):[m[41m[m
+src/api/rest_service.py:460: trailing whitespace.
+[32m+[m[32m            # (keine Distanz -> ans Ende), sonst nächstgelegen zuerst[m[41m[m
+src/api/rest_service.py:461: trailing whitespace.
+[32m+[m[32m            return (item.distance_km is None, item.distance_km if item.distance_km is not None else float("inf"))[m[41m[m
+src/api/rest_service.py:462: trailing whitespace.
+[32m+[m[32m        return sorted(results, key=_key)[m[41m[m
+src/api/rest_service.py:463: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:464: trailing whitespace.
+[32m+[m[32m    raise HTTPException(status_code=400, detail=f"Unbekannter sort_by-Wert: {sort_by}")[m[41m[m
+src/api/rest_service.py:465: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:466: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:467: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:468: trailing whitespace.
+[32m+[m[32m# FILTER-LOGIK[m[41m[m
+src/api/rest_service.py:469: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:470: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:471: trailing whitespace.
+[32m+[m[32mdef _any_in(doc_value: Any, allowed_values: List[str]) -> bool:[m[41m[m
+src/api/rest_service.py:472: trailing whitespace.
+[32m+[m[32m    """Prüft ob doc_value (String oder Liste) case-insensitiv mit einem der erlaubten Werte übereinstimmt."""[m[41m[m
+src/api/rest_service.py:473: trailing whitespace.
+[32m+[m[32m    if doc_value is None:[m[41m[m
+src/api/rest_service.py:474: trailing whitespace.
+[32m+[m[32m        return False[m[41m[m
+src/api/rest_service.py:475: trailing whitespace.
+[32m+[m[32m    allowed_lower = {v.lower() for v in allowed_values}[m[41m[m
+src/api/rest_service.py:476: trailing whitespace.
+[32m+[m[32m    if isinstance(doc_value, list):[m[41m[m
+src/api/rest_service.py:477: trailing whitespace.
+[32m+[m[32m        return any(str(v).lower() in allowed_lower for v in doc_value)[m[41m[m
+src/api/rest_service.py:478: trailing whitespace.
+[32m+[m[32m    return str(doc_value).lower() in allowed_lower[m[41m[m
+src/api/rest_service.py:479: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:480: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:481: trailing whitespace.
+[32m+[m[32mdef _arbeitszeit_matches(doc_value: Any, wanted: str) -> bool:[m[41m[m
+src/api/rest_service.py:482: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:483: trailing whitespace.
+[32m+[m[32m    "Beschäftigung" kann im Korpus "Vollzeit oder Teilzeit" lauten (beide[m[41m[m
+src/api/rest_service.py:484: trailing whitespace.
+[32m+[m[32m    möglich). Ein Filter auf "Vollzeit" soll solche Jobs trotzdem finden,[m[41m[m
+src/api/rest_service.py:485: trailing whitespace.
+[32m+[m[32m    daher hier Teilstring- statt Exact-Match (case-insensitiv).[m[41m[m
+src/api/rest_service.py:486: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:487: trailing whitespace.
+[32m+[m[32m    if not doc_value:[m[41m[m
+src/api/rest_service.py:488: trailing whitespace.
+[32m+[m[32m        return False[m[41m[m
+src/api/rest_service.py:489: trailing whitespace.
+[32m+[m[32m    return wanted.lower() in str(doc_value).lower()[m[41m[m
+src/api/rest_service.py:490: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:491: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:492: trailing whitespace.
+[32m+[m[32mdef get_allowed_doc_ids([m[41m[m
+src/api/rest_service.py:493: trailing whitespace.
+[32m+[m[32m    corpus: dict,[m[41m[m
+src/api/rest_service.py:494: trailing whitespace.
+[32m+[m[32m    filters: Optional[SearchFilters],[m[41m[m
+src/api/rest_service.py:495: trailing whitespace.
+[32m+[m[32m    doc_lats: np.ndarray,[m[41m[m
+src/api/rest_service.py:496: trailing whitespace.
+[32m+[m[32m    doc_lons: np.ndarray,[m[41m[m
+src/api/rest_service.py:497: trailing whitespace.
+[32m+[m[32m    doc_ids_with_geo: List[str],[m[41m[m
+src/api/rest_service.py:498: trailing whitespace.
+[32m+[m[32m) -> Optional[set]:[m[41m[m
+src/api/rest_service.py:499: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:500: trailing whitespace.
+[32m+[m[32m    Berechnet die Menge erlaubter doc_ids basierend auf den Filterkriterien.[m[41m[m
+src/api/rest_service.py:501: trailing whitespace.
+[32m+[m[32m    Rückgabe None bedeutet: kein Filter aktiv, kompletter Korpus erlaubt.[m[41m[m
+src/api/rest_service.py:502: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:503: trailing whitespace.
+[32m+[m[32m    if filters is None:[m[41m[m
+src/api/rest_service.py:504: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:505: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:506: trailing whitespace.
+[32m+[m[32m    has_categorical = any([m[41m[m
+src/api/rest_service.py:507: trailing whitespace.
+[32m+[m[32m        [[m[41m[m
+src/api/rest_service.py:508: trailing whitespace.
+[32m+[m[32m            filters.dienstverhaeltnis,[m[41m[m
+src/api/rest_service.py:509: trailing whitespace.
+[32m+[m[32m            filters.bereich,[m[41m[m
+src/api/rest_service.py:510: trailing whitespace.
+[32m+[m[32m            filters.beschaeftigungsdauer,[m[41m[m
+src/api/rest_service.py:511: trailing whitespace.
+[32m+[m[32m            filters.dienstort,[m[41m[m
+src/api/rest_service.py:512: trailing whitespace.
+[32m+[m[32m            filters.beschaeftigungsart,[m[41m[m
+src/api/rest_service.py:513: trailing whitespace.
+[32m+[m[32m        ][m[41m[m
+src/api/rest_service.py:514: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:515: trailing whitespace.
+[32m+[m[32m    has_geo = filters.plz_oder_ort and filters.max_distance_km is not None[m[41m[m
+src/api/rest_service.py:516: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:517: trailing whitespace.
+[32m+[m[32m    if not has_categorical and not has_geo:[m[41m[m
+src/api/rest_service.py:518: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:519: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:520: trailing whitespace.
+[32m+[m[32m    allowed = set(corpus.keys())[m[41m[m
+src/api/rest_service.py:521: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:522: trailing whitespace.
+[32m+[m[32m    if has_categorical:[m[41m[m
+src/api/rest_service.py:523: trailing whitespace.
+[32m+[m[32m        for doc_id, doc in corpus.items():[m[41m[m
+src/api/rest_service.py:524: trailing whitespace.
+[32m+[m[32m            if doc_id not in allowed:[m[41m[m
+src/api/rest_service.py:525: trailing whitespace.
+[32m+[m[32m                continue[m[41m[m
+src/api/rest_service.py:526: trailing whitespace.
+[32m+[m[32m            if filters.dienstverhaeltnis and not _any_in(doc.get(FIELD_DIENSTVERHAELTNIS), filters.dienstverhaeltnis):[m[41m[m
+src/api/rest_service.py:527: trailing whitespace.
+[32m+[m[32m                allowed.discard(doc_id)[m[41m[m
+src/api/rest_service.py:528: trailing whitespace.
+[32m+[m[32m                continue[m[41m[m
+src/api/rest_service.py:529: trailing whitespace.
+[32m+[m[32m            if filters.bereich and not _any_in(doc.get(FIELD_BEREICH), filters.bereich):[m[41m[m
+src/api/rest_service.py:530: trailing whitespace.
+[32m+[m[32m                allowed.discard(doc_id)[m[41m[m
+src/api/rest_service.py:531: trailing whitespace.
+[32m+[m[32m                continue[m[41m[m
+src/api/rest_service.py:532: trailing whitespace.
+[32m+[m[32m            if filters.beschaeftigungsdauer and not _any_in([m[41m[m
+src/api/rest_service.py:533: trailing whitespace.
+[32m+[m[32m                doc.get(FIELD_BESCHAEFTIGUNGSDAUER), filters.beschaeftigungsdauer[m[41m[m
+src/api/rest_service.py:534: trailing whitespace.
+[32m+[m[32m            ):[m[41m[m
+src/api/rest_service.py:535: trailing whitespace.
+[32m+[m[32m                allowed.discard(doc_id)[m[41m[m
+src/api/rest_service.py:536: trailing whitespace.
+[32m+[m[32m                continue[m[41m[m
+src/api/rest_service.py:537: trailing whitespace.
+[32m+[m[32m            if filters.dienstort and not _any_in(doc.get(FIELD_DIENSTORT), filters.dienstort):[m[41m[m
+src/api/rest_service.py:538: trailing whitespace.
+[32m+[m[32m                allowed.discard(doc_id)[m[41m[m
+src/api/rest_service.py:539: trailing whitespace.
+[32m+[m[32m                continue[m[41m[m
+src/api/rest_service.py:540: trailing whitespace.
+[32m+[m[32m            if filters.beschaeftigungsart and not _arbeitszeit_matches([m[41m[m
+src/api/rest_service.py:541: trailing whitespace.
+[32m+[m[32m                doc.get(FIELD_BESCHAEFTIGUNGSART), filters.beschaeftigungsart[m[41m[m
+src/api/rest_service.py:542: trailing whitespace.
+[32m+[m[32m            ):[m[41m[m
+src/api/rest_service.py:543: trailing whitespace.
+[32m+[m[32m                allowed.discard(doc_id)[m[41m[m
+src/api/rest_service.py:544: trailing whitespace.
+[32m+[m[32m                continue[m[41m[m
+src/api/rest_service.py:545: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:546: trailing whitespace.
+[32m+[m[32m    if has_geo:[m[41m[m
+src/api/rest_service.py:547: trailing whitespace.
+[32m+[m[32m        ref = resolve_to_latlon(filters.plz_oder_ort)[m[41m[m
+src/api/rest_service.py:548: trailing whitespace.
+[32m+[m[32m        if ref is None:[m[41m[m
+src/api/rest_service.py:549: trailing whitespace.
+[32m+[m[32m            logger.warning("PLZ/Ort '%s' konnte nicht aufgelöst werden.", filters.plz_oder_ort)[m[41m[m
+src/api/rest_service.py:550: trailing whitespace.
+[32m+[m[32m            return set()  # konservativ: kein Treffer statt stillem Ignorieren[m[41m[m
+src/api/rest_service.py:551: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:552: trailing whitespace.
+[32m+[m[32m        ref_lat, ref_lon = ref[m[41m[m
+src/api/rest_service.py:553: trailing whitespace.
+[32m+[m[32m        dists = haversine_km(ref_lat, ref_lon, doc_lats, doc_lons)[m[41m[m
+src/api/rest_service.py:554: trailing whitespace.
+[32m+[m[32m        within_radius = {[m[41m[m
+src/api/rest_service.py:555: trailing whitespace.
+[32m+[m[32m            doc_ids_with_geo[i] for i, d in enumerate(dists) if d <= filters.max_distance_km[m[41m[m
+src/api/rest_service.py:556: trailing whitespace.
+[32m+[m[32m        }[m[41m[m
+src/api/rest_service.py:557: trailing whitespace.
+[32m+[m[32m        allowed &= within_radius[m[41m[m
+src/api/rest_service.py:558: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:559: trailing whitespace.
+[32m+[m[32m    return allowed[m[41m[m
+src/api/rest_service.py:560: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:561: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:562: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:563: trailing whitespace.
+[32m+[m[32m# GLOBALER STATE (einmal beim Start geladen, teure Objekte)[m[41m[m
+src/api/rest_service.py:564: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:565: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:566: trailing whitespace.
+[32m+[m[32mclass PipelineComponents:[m[41m[m
+src/api/rest_service.py:567: trailing whitespace.
+[32m+[m[32m    corpus: dict = {}[m[41m[m
+src/api/rest_service.py:568: trailing whitespace.
+[32m+[m[32m    queries: dict = {}[m[41m[m
+src/api/rest_service.py:569: trailing whitespace.
+[32m+[m[32m    qrels: dict = {}[m[41m[m
+src/api/rest_service.py:570: trailing whitespace.
+[32m+[m[32m    bm25: Optional[BM25Retriever] = None[m[41m[m
+src/api/rest_service.py:571: trailing whitespace.
+[32m+[m[32m    dense: Optional[DenseRetriever] = None[m[41m[m
+src/api/rest_service.py:572: trailing whitespace.
+[32m+[m[32m    alpha_retriever: Optional[HybridFusionRetriever] = None[m[41m[m
+src/api/rest_service.py:573: trailing whitespace.
+[32m+[m[32m    xgb_retriever: Optional[XGBFusionRetriever] = None[m[41m[m
+src/api/rest_service.py:574: trailing whitespace.
+[32m+[m[32m    query_expander: Optional[QueryExpander] = None[m[41m[m
+src/api/rest_service.py:575: trailing whitespace.
+[32m+[m[32m    ce_reranker: Optional[CrossEncoderReranker] = None[m[41m[m
+src/api/rest_service.py:576: trailing whitespace.
+[32m+[m[32m    spell_corrector: Optional[SpellCorrector] = None[m[41m[m
+src/api/rest_service.py:577: trailing whitespace.
+[32m+[m[32m    abbreviation_expander: Optional[AbbreviationExpander] = None[m[41m[m
+src/api/rest_service.py:578: trailing whitespace.
+[32m+[m[32m    variant_normalizer: Optional[SpellingVariantNormalizer] = None[m[41m[m
+src/api/rest_service.py:579: trailing whitespace.
+[32m+[m[32m    behoerden_normalizer: Optional[BehoerdenNormalizer] = None[m[41m[m
+src/api/rest_service.py:580: trailing whitespace.
+[32m+[m[32m    compound_splitter: Optional[CompoundSplitter] = None[m[41m[m
+src/api/rest_service.py:581: trailing whitespace.
+[32m+[m[32m    doc_lats: np.ndarray = np.array([])[m[41m[m
+src/api/rest_service.py:582: trailing whitespace.
+[32m+[m[32m    doc_lons: np.ndarray = np.array([])[m[41m[m
+src/api/rest_service.py:583: trailing whitespace.
+[32m+[m[32m    doc_ids_with_geo: List[str] = [][m[41m[m
+src/api/rest_service.py:584: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:585: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:586: trailing whitespace.
+[32m+[m[32mPC = PipelineComponents()[m[41m[m
+src/api/rest_service.py:587: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:588: trailing whitespace.
+[32m+[m[32m# Schützt build_pipeline_components() davor, dass zwei Reloads[m[41m[m
+src/api/rest_service.py:589: trailing whitespace.
+[32m+[m[32m# gleichzeitig laufen (z.B. wenn versehentlich zweimal getriggert wird).[m[41m[m
+src/api/rest_service.py:590: trailing whitespace.
+[32m+[m[32m_reload_lock = threading.Lock()[m[41m[m
+src/api/rest_service.py:591: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:592: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:593: trailing whitespace.
+[32m+[m[32mdef load_jsonl(path: Path) -> dict:[m[41m[m
+src/api/rest_service.py:594: trailing whitespace.
+[32m+[m[32m    data = {}[m[41m[m
+src/api/rest_service.py:595: trailing whitespace.
+[32m+[m[32m    with open(path, "r", encoding="utf-8") as f:[m[41m[m
+src/api/rest_service.py:596: trailing whitespace.
+[32m+[m[32m        for line in f:[m[41m[m
+src/api/rest_service.py:597: trailing whitespace.
+[32m+[m[32m            item = json.loads(line)[m[41m[m
+src/api/rest_service.py:598: trailing whitespace.
+[32m+[m[32m            data[item["_id"]] = item[m[41m[m
+src/api/rest_service.py:599: trailing whitespace.
+[32m+[m[32m    return data[m[41m[m
+src/api/rest_service.py:600: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:601: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:602: trailing whitespace.
+[32m+[m[32mdef load_qrels(path: Path) -> dict:[m[41m[m
+src/api/rest_service.py:603: trailing whitespace.
+[32m+[m[32m    """Erwartet TSV mit Header-Zeile: query-id\tcorpus-id\tscore (BEIR-Format)."""[m[41m[m
+src/api/rest_service.py:604: trailing whitespace.
+[32m+[m[32m    qrels: dict = {}[m[41m[m
+src/api/rest_service.py:605: trailing whitespace.
+[32m+[m[32m    with open(path, "r", encoding="utf-8") as f:[m[41m[m
+src/api/rest_service.py:606: trailing whitespace.
+[32m+[m[32m        next(f)  # Header überspringen[m[41m[m
+src/api/rest_service.py:607: trailing whitespace.
+[32m+[m[32m        for line in f:[m[41m[m
+src/api/rest_service.py:608: trailing whitespace.
+[32m+[m[32m            qid, docid, score = line.strip().split("\t")[m[41m[m
+src/api/rest_service.py:609: trailing whitespace.
+[32m+[m[32m            qrels.setdefault(qid, {})[docid] = float(score)[m[41m[m
+src/api/rest_service.py:610: trailing whitespace.
+[32m+[m[32m    return qrels[m[41m[m
+src/api/rest_service.py:611: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:612: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:613: trailing whitespace.
+[32m+[m[32mdef build_doc_geo_cache(corpus: dict):[m[41m[m
+src/api/rest_service.py:614: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:615: trailing whitespace.
+[32m+[m[32m    Löst pro Dokument den/die Einsatzort(e) zu Koordinaten auf (einmalig,[m[41m[m
+src/api/rest_service.py:616: trailing whitespace.
+[32m+[m[32m    gecacht). Bevorzugt die bereits in "einsatzorte" mitgelieferten echten[m[41m[m
+src/api/rest_service.py:617: trailing whitespace.
+[32m+[m[32m    Koordinaten (aus der Interamt-API, präzise); nur falls die fehlen, wird[m[41m[m
+src/api/rest_service.py:618: trailing whitespace.
+[32m+[m[32m    per Ortsname (pgeocode) nachgeocoded -- als Fallback für ältere[m[41m[m
+src/api/rest_service.py:619: trailing whitespace.
+[32m+[m[32m    corpus.jsonl-Dateien ohne "einsatzorte" bzw. für Orte ohne Koordinaten.[m[41m[m
+src/api/rest_service.py:620: trailing whitespace.
+[32m+[m[32m    Ein Job kann so mehrere Einträge (mehrere Einsatzorte) im Cache haben.[m[41m[m
+src/api/rest_service.py:621: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:622: trailing whitespace.
+[32m+[m[32m    place_cache: dict = {}[m[41m[m
+src/api/rest_service.py:623: trailing whitespace.
+[32m+[m[32m    lats, lons, ids = [], [], [][m[41m[m
+src/api/rest_service.py:624: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:625: trailing whitespace.
+[32m+[m[32m    for doc_id, doc in corpus.items():[m[41m[m
+src/api/rest_service.py:626: trailing whitespace.
+[32m+[m[32m        einsatzorte = doc.get(FIELD_EINSATZORTE)[m[41m[m
+src/api/rest_service.py:627: trailing whitespace.
+[32m+[m[32m        used_precomputed = False[m[41m[m
+src/api/rest_service.py:628: trailing whitespace.
+[32m+[m[32m        if einsatzorte:[m[41m[m
+src/api/rest_service.py:629: trailing whitespace.
+[32m+[m[32m            for entry in einsatzorte:[m[41m[m
+src/api/rest_service.py:630: trailing whitespace.
+[32m+[m[32m                if not isinstance(entry, dict):[m[41m[m
+src/api/rest_service.py:631: trailing whitespace.
+[32m+[m[32m                    continue[m[41m[m
+src/api/rest_service.py:632: trailing whitespace.
+[32m+[m[32m                lat, lon = entry.get("latitude"), entry.get("longitude")[m[41m[m
+src/api/rest_service.py:633: trailing whitespace.
+[32m+[m[32m                if lat is None or lon is None:[m[41m[m
+src/api/rest_service.py:634: trailing whitespace.
+[32m+[m[32m                    continue[m[41m[m
+src/api/rest_service.py:635: trailing whitespace.
+[32m+[m[32m                try:[m[41m[m
+src/api/rest_service.py:636: trailing whitespace.
+[32m+[m[32m                    lats.append(float(lat))[m[41m[m
+src/api/rest_service.py:637: trailing whitespace.
+[32m+[m[32m                    lons.append(float(lon))[m[41m[m
+src/api/rest_service.py:638: trailing whitespace.
+[32m+[m[32m                    ids.append(doc_id)[m[41m[m
+src/api/rest_service.py:639: trailing whitespace.
+[32m+[m[32m                    used_precomputed = True[m[41m[m
+src/api/rest_service.py:640: trailing whitespace.
+[32m+[m[32m                except (TypeError, ValueError):[m[41m[m
+src/api/rest_service.py:641: trailing whitespace.
+[32m+[m[32m                    continue[m[41m[m
+src/api/rest_service.py:642: trailing whitespace.
+[32m+[m[32m        if used_precomputed:[m[41m[m
+src/api/rest_service.py:643: trailing whitespace.
+[32m+[m[32m            continue[m[41m[m
+src/api/rest_service.py:644: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:645: trailing whitespace.
+[32m+[m[32m        # Fallback: Ortsname auflösen (altes Schema ohne "einsatzorte" bzw.[m[41m[m
+src/api/rest_service.py:646: trailing whitespace.
+[32m+[m[32m        # ohne Koordinaten darin).[m[41m[m
+src/api/rest_service.py:647: trailing whitespace.
+[32m+[m[32m        ort = doc.get(FIELD_DIENSTORT)[m[41m[m
+src/api/rest_service.py:648: trailing whitespace.
+[32m+[m[32m        if isinstance(ort, list):[m[41m[m
+src/api/rest_service.py:649: trailing whitespace.
+[32m+[m[32m            ort = ort[0] if ort else None[m[41m[m
+src/api/rest_service.py:650: trailing whitespace.
+[32m+[m[32m        if not ort:[m[41m[m
+src/api/rest_service.py:651: trailing whitespace.
+[32m+[m[32m            ort = parse_preamble(doc.get(FIELD_TEXT)).get("Einsatzort")[m[41m[m
+src/api/rest_service.py:652: trailing whitespace.
+[32m+[m[32m        if not ort:[m[41m[m
+src/api/rest_service.py:653: trailing whitespace.
+[32m+[m[32m            continue[m[41m[m
+src/api/rest_service.py:654: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:655: trailing whitespace.
+[32m+[m[32m        if ort not in place_cache:[m[41m[m
+src/api/rest_service.py:656: trailing whitespace.
+[32m+[m[32m            place_cache[ort] = resolve_to_latlon(ort)[m[41m[m
+src/api/rest_service.py:657: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:658: trailing whitespace.
+[32m+[m[32m        latlon = place_cache[ort][m[41m[m
+src/api/rest_service.py:659: trailing whitespace.
+[32m+[m[32m        if latlon is not None:[m[41m[m
+src/api/rest_service.py:660: trailing whitespace.
+[32m+[m[32m            lats.append(latlon[0])[m[41m[m
+src/api/rest_service.py:661: trailing whitespace.
+[32m+[m[32m            lons.append(latlon[1])[m[41m[m
+src/api/rest_service.py:662: trailing whitespace.
+[32m+[m[32m            ids.append(doc_id)[m[41m[m
+src/api/rest_service.py:663: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:664: trailing whitespace.
+[32m+[m[32m    return np.array(lats), np.array(lons), ids[m[41m[m
+src/api/rest_service.py:665: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:666: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:667: trailing whitespace.
+[32m+[m[32mdef build_pipeline_components() -> PipelineComponents:[m[41m[m
+src/api/rest_service.py:668: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:669: trailing whitespace.
+[32m+[m[32m    Baut eine komplette, frische PipelineComponents-Instanz auf Basis[m[41m[m
+src/api/rest_service.py:670: trailing whitespace.
+[32m+[m[32m    der aktuellen corpus.jsonl auf. Wird sowohl beim Startup als auch[m[41m[m
+src/api/rest_service.py:671: trailing whitespace.
+[32m+[m[32m    beim /admin/reload verwendet.[m[41m[m
+src/api/rest_service.py:672: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:673: trailing whitespace.
+[32m+[m[32m    Läuft bewusst auf einem NEUEN Objekt (nicht auf dem globalen PC),[m[41m[m
+src/api/rest_service.py:674: trailing whitespace.
+[32m+[m[32m    damit der bisherige globale State während des kompletten Builds[m[41m[m
+src/api/rest_service.py:675: trailing whitespace.
+[32m+[m[32m    weiter Requests bedienen kann (Double-Buffering). Der Aufrufer[m[41m[m
+src/api/rest_service.py:676: trailing whitespace.
+[32m+[m[32m    tauscht das Ergebnis erst danach atomar in die globale Variable PC.[m[41m[m
+src/api/rest_service.py:677: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:678: trailing whitespace.
+[32m+[m[32m    # Vor dem teuren Korpus-Download und Encoding abbrechen, falls die[m[41m[m
+src/api/rest_service.py:679: trailing whitespace.
+[32m+[m[32m    # Embedding-Datenbank nicht erreichbar ist.[m[41m[m
+src/api/rest_service.py:680: trailing whitespace.
+[32m+[m[32m    database = _database_status()[m[41m[m
+src/api/rest_service.py:681: trailing whitespace.
+[32m+[m[32m    if database["status"] != "ok":[m[41m[m
+src/api/rest_service.py:682: trailing whitespace.
+[32m+[m[32m        raise RuntimeError(f"Embedding-Datenbank nicht erreichbar: {database['error']}")[m[41m[m
+src/api/rest_service.py:683: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:684: trailing whitespace.
+[32m+[m[32m    new_pc = PipelineComponents()[m[41m[m
+src/api/rest_service.py:685: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:686: trailing whitespace.
+[32m+[m[32m    if READ_ONLY_WORKER:[m[41m[m
+src/api/rest_service.py:687: trailing whitespace.
+[32m+[m[32m        if not CORPUS_PATH.exists():[m[41m[m
+src/api/rest_service.py:688: trailing whitespace.
+[32m+[m[32m            raise RuntimeError([m[41m[m
+src/api/rest_service.py:689: trailing whitespace.
+[32m+[m[32m                f"Worker-Korpus nicht gefunden: {CORPUS_PATH}. "[m[41m[m
+src/api/rest_service.py:690: trailing whitespace.
+[32m+[m[32m                "Der Master muss den Korpus zuerst bereitstellen."[m[41m[m
+src/api/rest_service.py:691: trailing whitespace.
+[32m+[m[32m            )[m[41m[m
+src/api/rest_service.py:692: trailing whitespace.
+[32m+[m[32m        logger.info("Worker-Modus: verwende vorhandenen Korpus %s.", CORPUS_PATH)[m[41m[m
+src/api/rest_service.py:693: trailing whitespace.
+[32m+[m[32m    else:[m[41m[m
+src/api/rest_service.py:694: trailing whitespace.
+[32m+[m[32m        logger.info("Master-Modus: lade aktuellen Korpus von der Interamt-API ...")[m[41m[m
+src/api/rest_service.py:695: trailing whitespace.
+[32m+[m[32m        fetch_and_store_corpus(CORPUS_PATH)[m[41m[m
+src/api/rest_service.py:696: trailing whitespace.
+[32m+[m[32m    new_pc.corpus = load_jsonl(CORPUS_PATH)[m[41m[m
+src/api/rest_service.py:697: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:698: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Rechtschreibkorrektur ...")[m[41m[m
+src/api/rest_service.py:699: trailing whitespace.
+[32m+[m[32m    new_pc.spell_corrector = SpellCorrector(new_pc.corpus)[m[41m[m
+src/api/rest_service.py:700: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:701: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Abkürzungserkennung ...")[m[41m[m
+src/api/rest_service.py:702: trailing whitespace.
+[32m+[m[32m    new_pc.abbreviation_expander = AbbreviationExpander([m[41m[m
+src/api/rest_service.py:703: trailing whitespace.
+[32m+[m[32m    custom_path=ABBREVIATION_CONFIG_PATH if ABBREVIATION_CONFIG_PATH.exists() else None[m[41m[m
+src/api/rest_service.py:704: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:705: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:706: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Behördensprache-Normalisierung ...")[m[41m[m
+src/api/rest_service.py:707: trailing whitespace.
+[32m+[m[32m    new_pc.behoerden_normalizer = BehoerdenNormalizer([m[41m[m
+src/api/rest_service.py:708: trailing whitespace.
+[32m+[m[32m        custom_path=BEHOERDEN_CONFIG_PATH if BEHOERDEN_CONFIG_PATH.exists() else None[m[41m[m
+src/api/rest_service.py:709: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:710: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:711: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Schreibweisen-Normalisierung ...")[m[41m[m
+src/api/rest_service.py:712: trailing whitespace.
+[32m+[m[32m    new_pc.variant_normalizer = SpellingVariantNormalizer([m[41m[m
+src/api/rest_service.py:713: trailing whitespace.
+[32m+[m[32m        custom_path=VARIANT_CONFIG_PATH if VARIANT_CONFIG_PATH.exists() else None[m[41m[m
+src/api/rest_service.py:714: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:715: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:716: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Komposita-Splitter ...")[m[41m[m
+src/api/rest_service.py:717: trailing whitespace.
+[32m+[m[32m    new_pc.compound_splitter = CompoundSplitter([m[41m[m
+src/api/rest_service.py:718: trailing whitespace.
+[32m+[m[32m        new_pc.corpus,[m[41m[m
+src/api/rest_service.py:719: trailing whitespace.
+[32m+[m[32m        custom_path=COMPOUND_DICT_PATH if COMPOUND_DICT_PATH.exists() else None,[m[41m[m
+src/api/rest_service.py:720: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:721: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:722: trailing whitespace.
+[32m+[m[32m    # Queries/Qrels sind nur für die /evaluate-Endpoints relevant und[m[41m[m
+src/api/rest_service.py:723: trailing whitespace.
+[32m+[m[32m    # rein optional -- falls die Dateien (noch) nicht existieren, bleibt[m[41m[m
+src/api/rest_service.py:724: trailing whitespace.
+[32m+[m[32m    # der Live-Service trotzdem voll funktionsfähig, nur /evaluate liefert[m[41m[m
+src/api/rest_service.py:725: trailing whitespace.
+[32m+[m[32m    # dann einen 503.[m[41m[m
+src/api/rest_service.py:726: trailing whitespace.
+[32m+[m[32m    if QUERIES_PATH.exists() and QRELS_PATH.exists():[m[41m[m
+src/api/rest_service.py:727: trailing whitespace.
+[32m+[m[32m        logger.info("Lade Evaluations-Queries/Qrels aus %s ...", DATASET_DIR)[m[41m[m
+src/api/rest_service.py:728: trailing whitespace.
+[32m+[m[32m        new_pc.queries = load_jsonl(QUERIES_PATH)[m[41m[m
+src/api/rest_service.py:729: trailing whitespace.
+[32m+[m[32m        new_pc.qrels = load_qrels(QRELS_PATH)[m[41m[m
+src/api/rest_service.py:730: trailing whitespace.
+[32m+[m[32m    else:[m[41m[m
+src/api/rest_service.py:731: trailing whitespace.
+[32m+[m[32m        logger.warning([m[41m[m
+src/api/rest_service.py:732: trailing whitespace.
+[32m+[m[32m            "queries.jsonl oder qrels/test.tsv nicht gefunden unter %s — "[m[41m[m
+src/api/rest_service.py:733: trailing whitespace.
+[32m+[m[32m            "/evaluate-Endpoints bleiben deaktiviert.",[m[41m[m
+src/api/rest_service.py:734: trailing whitespace.
+[32m+[m[32m            DATASET_DIR,[m[41m[m
+src/api/rest_service.py:735: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:736: trailing whitespace.
+[32m+[m[32m        new_pc.queries = {}[m[41m[m
+src/api/rest_service.py:737: trailing whitespace.
+[32m+[m[32m        new_pc.qrels = {}[m[41m[m
+src/api/rest_service.py:738: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:739: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere BM25 ...")[m[41m[m
+src/api/rest_service.py:740: trailing whitespace.
+[32m+[m[32m    new_pc.bm25 = BM25Retriever(new_pc.corpus)[m[41m[m
+src/api/rest_service.py:741: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:742: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Dense Retriever (inkrementeller Embedding-Cache) ...")[m[41m[m
+src/api/rest_service.py:743: trailing whitespace.
+[32m+[m[32m    # DenseRetriever muss intern per Content-Hash erkennen, welche Docs[m[41m[m
+src/api/rest_service.py:744: trailing whitespace.
+[32m+[m[32m    # neu/geändert/entfernt sind, und nur diese neu encodieren.[m[41m[m
+src/api/rest_service.py:745: trailing whitespace.
+[32m+[m[32m    new_pc.dense = DenseRetriever([m[41m[m
+src/api/rest_service.py:746: trailing whitespace.
+[32m+[m[32m        new_pc.corpus,[m[41m[m
+src/api/rest_service.py:747: trailing whitespace.
+[32m+[m[32m        cache_path=EMBEDDING_DATABASE_URL,[m[41m[m
+src/api/rest_service.py:748: trailing whitespace.
+[32m+[m[32m        read_only=READ_ONLY_WORKER,[m[41m[m
+src/api/rest_service.py:749: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:750: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:751: trailing whitespace.
+[32m+[m[32m    # Dedupliziert Query-Embeddings für den Dense-Pfad innerhalb einer[m[41m[m
+src/api/rest_service.py:752: trailing whitespace.
+[32m+[m[32m    # PipelineComponents-Instanz.[m[41m[m
+src/api/rest_service.py:753: trailing whitespace.
+[32m+[m[32m    query_cache = QueryEmbeddingCache(new_pc.dense.model)[m[41m[m
+src/api/rest_service.py:754: trailing whitespace.
+[32m+[m[32m    new_pc.dense.query_cache = query_cache[m[41m[m
+src/api/rest_service.py:755: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:756: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Query Expansion ...")[m[41m[m
+src/api/rest_service.py:757: trailing whitespace.
+[32m+[m[32m    new_pc.query_expander = QueryExpander([m[41m[m
+src/api/rest_service.py:758: trailing whitespace.
+[32m+[m[32m        bm25=new_pc.bm25, corpus=new_pc.corpus, doc_ids=new_pc.bm25.doc_ids[m[41m[m
+src/api/rest_service.py:759: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:760: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:761: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Cross-Encoder Reranker ...")[m[41m[m
+src/api/rest_service.py:762: trailing whitespace.
+[32m+[m[32m    new_pc.ce_reranker = CrossEncoderReranker()[m[41m[m
+src/api/rest_service.py:763: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:764: trailing whitespace.
+[32m+[m[32m    logger.info("Initialisiere Alpha-Fusion Retriever ...")[m[41m[m
+src/api/rest_service.py:765: trailing whitespace.
+[32m+[m[32m    new_pc.alpha_retriever = HybridFusionRetriever([m[41m[m
+src/api/rest_service.py:766: trailing whitespace.
+[32m+[m[32m        bm25_retriever=new_pc.bm25, dense_retriever=new_pc.dense, alpha=0.2[m[41m[m
+src/api/rest_service.py:767: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:768: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:769: trailing whitespace.
+[32m+[m[32m    # XGB-Retriever: nur aktivieren, wenn ein trainiertes Modell vorliegt[m[41m[m
+src/api/rest_service.py:770: trailing whitespace.
+[32m+[m[32m    # (Training passiert offline, z.B. via scripts/train_xgb_model.py).[m[41m[m
+src/api/rest_service.py:771: trailing whitespace.
+[32m+[m[32m    # Ein Korpus-Reload lädt bewusst NICHT automatisch ein neues Modell[m[41m[m
+src/api/rest_service.py:772: trailing whitespace.
+[32m+[m[32m    # neu, sondern nur die aktuell auf Disk liegende Datei -- falls das[m[41m[m
+src/api/rest_service.py:773: trailing whitespace.
+[32m+[m[32m    # XGB-Modell separat neu trainiert wurde, liegt es bereits unter[m[41m[m
+src/api/rest_service.py:774: trailing whitespace.
+[32m+[m[32m    # XGB_MODEL_PATH und wird hier mit aufgenommen.[m[41m[m
+src/api/rest_service.py:775: trailing whitespace.
+[32m+[m[32m    if XGB_MODEL_PATH.exists():[m[41m[m
+src/api/rest_service.py:776: trailing whitespace.
+[32m+[m[32m        logger.info("Lade trainiertes XGB-Modell aus %s ...", XGB_MODEL_PATH)[m[41m[m
+src/api/rest_service.py:777: trailing whitespace.
+[32m+[m[32m        trained_model = XGBFusionModel()[m[41m[m
+src/api/rest_service.py:778: trailing whitespace.
+[32m+[m[32m        trained_model.load(XGB_MODEL_PATH)[m[41m[m
+src/api/rest_service.py:779: trailing whitespace.
+[32m+[m[32m        new_pc.xgb_retriever = XGBFusionRetriever([m[41m[m
+src/api/rest_service.py:780: trailing whitespace.
+[32m+[m[32m            bm25=new_pc.bm25, dense=new_pc.dense, model=trained_model, corpus=new_pc.corpus[m[41m[m
+src/api/rest_service.py:781: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:782: trailing whitespace.
+[32m+[m[32m    else:[m[41m[m
+src/api/rest_service.py:783: trailing whitespace.
+[32m+[m[32m        logger.warning([m[41m[m
+src/api/rest_service.py:784: trailing whitespace.
+[32m+[m[32m            "Kein trainiertes XGB-Modell unter %s gefunden — base='xgb' bleibt deaktiviert.",[m[41m[m
+src/api/rest_service.py:785: trailing whitespace.
+[32m+[m[32m            XGB_MODEL_PATH,[m[41m[m
+src/api/rest_service.py:786: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:787: trailing whitespace.
+[32m+[m[32m        new_pc.xgb_retriever = None[m[41m[m
+src/api/rest_service.py:788: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:789: trailing whitespace.
+[32m+[m[32m    logger.info("Baue Geo-Cache für Distanzfilter ...")[m[41m[m
+src/api/rest_service.py:790: trailing whitespace.
+[32m+[m[32m    new_pc.doc_lats, new_pc.doc_lons, new_pc.doc_ids_with_geo = build_doc_geo_cache(new_pc.corpus)[m[41m[m
+src/api/rest_service.py:791: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:792: trailing whitespace.
+[32m+[m[32m    logger.info("Pipeline-Build abgeschlossen. %d Dokumente geladen.", len(new_pc.corpus))[m[41m[m
+src/api/rest_service.py:793: trailing whitespace.
+[32m+[m[32m    return new_pc[m[41m[m
+src/api/rest_service.py:794: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:795: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:796: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:797: trailing whitespace.
+[32m+[m[32m# HILFSFUNKTIONEN FÜR SUCHERGEBNISSE[m[41m[m
+src/api/rest_service.py:798: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:799: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:800: trailing whitespace.
+[32m+[m[32mdef _make_snippet(text: Optional[str], max_chars: int = SNIPPET_MAX_CHARS) -> Optional[str]:[m[41m[m
+src/api/rest_service.py:801: trailing whitespace.
+[32m+[m[32m    """Kürzt einen Text auf eine lesbare Länge (Wortgrenze, kein harter Cut)."""[m[41m[m
+src/api/rest_service.py:802: trailing whitespace.
+[32m+[m[32m    if not text or not isinstance(text, str):[m[41m[m
+src/api/rest_service.py:803: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:804: trailing whitespace.
+[32m+[m[32m    text = " ".join(text.split())  # Whitespace/Zeilenumbrüche normalisieren[m[41m[m
+src/api/rest_service.py:805: trailing whitespace.
+[32m+[m[32m    if not text:[m[41m[m
+src/api/rest_service.py:806: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:807: trailing whitespace.
+[32m+[m[32m    if len(text) <= max_chars:[m[41m[m
+src/api/rest_service.py:808: trailing whitespace.
+[32m+[m[32m        return text[m[41m[m
+src/api/rest_service.py:809: trailing whitespace.
+[32m+[m[32m    truncated = text[:max_chars].rsplit(" ", 1)[0][m[41m[m
+src/api/rest_service.py:810: trailing whitespace.
+[32m+[m[32m    return truncated + "…"[m[41m[m
+src/api/rest_service.py:811: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:812: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:813: trailing whitespace.
+[32m+[m[32mdef parse_preamble(text: Optional[str]) -> Dict[str, Any]:[m[41m[m
+src/api/rest_service.py:814: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:815: trailing whitespace.
+[32m+[m[32m    Die "text"-Felder im Korpus beginnen mit einer strukturierten Präambel[m[41m[m
+src/api/rest_service.py:816: trailing whitespace.
+[32m+[m[32m    aus Label:Wert-Sätzen, z.B.[m[41m[m
+src/api/rest_service.py:817: trailing whitespace.
+[32m+[m[32m        "Stelle: ... . Behörde: Stadt Rheine. Aufgabenbereich: allgemeine[m[41m[m
+src/api/rest_service.py:818: trailing whitespace.
+[32m+[m[32m         verwaltung, it und telekommunikation. Einsatzort: Rheine.[m[41m[m
+src/api/rest_service.py:819: trailing whitespace.
+[32m+[m[32m         Beschäftigung: Vollzeit. <freier Fließtext ...>"[m[41m[m
+src/api/rest_service.py:820: trailing whitespace.
+[32m+[m[32m    corpus.jsonl hat dafür KEINE eigenen JSON-Felder -- wir parsen die[m[41m[m
+src/api/rest_service.py:821: trailing whitespace.
+[32m+[m[32m    Präambel deshalb hier heraus. Gibt ein Dict mit den gefundenen Labels[m[41m[m
+src/api/rest_service.py:822: trailing whitespace.
+[32m+[m[32m    (als Rohstrings) plus "_preamble_end" (Zeichenindex, ab dem der freie[m[41m[m
+src/api/rest_service.py:823: trailing whitespace.
+[32m+[m[32m    Fließtext beginnt) zurück.[m[41m[m
+src/api/rest_service.py:824: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:825: trailing whitespace.
+[32m+[m[32m    result: Dict[str, Any] = {"_preamble_end": 0}[m[41m[m
+src/api/rest_service.py:826: trailing whitespace.
+[32m+[m[32m    if not text:[m[41m[m
+src/api/rest_service.py:827: trailing whitespace.
+[32m+[m[32m        return result[m[41m[m
+src/api/rest_service.py:828: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:829: trailing whitespace.
+[32m+[m[32m    for match in _PREAMBLE_LABEL_PATTERN.finditer(text):[m[41m[m
+src/api/rest_service.py:830: trailing whitespace.
+[32m+[m[32m        if match.start() > _PREAMBLE_SEARCH_LIMIT_CHARS:[m[41m[m
+src/api/rest_service.py:831: trailing whitespace.
+[32m+[m[32m            break[m[41m[m
+src/api/rest_service.py:832: trailing whitespace.
+[32m+[m[32m        label, value = match.group(1), match.group(2).strip()[m[41m[m
+src/api/rest_service.py:833: trailing whitespace.
+[32m+[m[32m        if label not in result:  # erstes Vorkommen zählt -- das ist die Präambel[m[41m[m
+src/api/rest_service.py:834: trailing whitespace.
+[32m+[m[32m            result[label] = value[m[41m[m
+src/api/rest_service.py:835: trailing whitespace.
+[32m+[m[32m        result["_preamble_end"] = max(result["_preamble_end"], match.end())[m[41m[m
+src/api/rest_service.py:836: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:837: trailing whitespace.
+[32m+[m[32m    return result[m[41m[m
+src/api/rest_service.py:838: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:839: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:840: trailing whitespace.
+[32m+[m[32mdef _format_einsatzorte(einsatzorte: Optional[List[dict]]) -> Optional[List[str]]:[m[41m[m
+src/api/rest_service.py:841: trailing whitespace.
+[32m+[m[32m    """Wandelt die strukturierte einsatzorte-Liste in lesbare 'Ort (Bundesland)'-Strings für die Anzeige um."""[m[41m[m
+src/api/rest_service.py:842: trailing whitespace.
+[32m+[m[32m    if not einsatzorte:[m[41m[m
+src/api/rest_service.py:843: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:844: trailing whitespace.
+[32m+[m[32m    formatted = [][m[41m[m
+src/api/rest_service.py:845: trailing whitespace.
+[32m+[m[32m    for entry in einsatzorte:[m[41m[m
+src/api/rest_service.py:846: trailing whitespace.
+[32m+[m[32m        if not isinstance(entry, dict):[m[41m[m
+src/api/rest_service.py:847: trailing whitespace.
+[32m+[m[32m            continue[m[41m[m
+src/api/rest_service.py:848: trailing whitespace.
+[32m+[m[32m        ort = entry.get("ort")[m[41m[m
+src/api/rest_service.py:849: trailing whitespace.
+[32m+[m[32m        bundesland = entry.get("bundesland")[m[41m[m
+src/api/rest_service.py:850: trailing whitespace.
+[32m+[m[32m        if ort and bundesland:[m[41m[m
+src/api/rest_service.py:851: trailing whitespace.
+[32m+[m[32m            formatted.append(f"{ort} ({bundesland})")[m[41m[m
+src/api/rest_service.py:852: trailing whitespace.
+[32m+[m[32m        elif ort:[m[41m[m
+src/api/rest_service.py:853: trailing whitespace.
+[32m+[m[32m            formatted.append(ort)[m[41m[m
+src/api/rest_service.py:854: trailing whitespace.
+[32m+[m[32m    return formatted or None[m[41m[m
+src/api/rest_service.py:855: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:856: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:857: trailing whitespace.
+[32m+[m[32mdef build_document_details(doc: dict) -> Optional[DocumentDetails]:[m[41m[m
+src/api/rest_service.py:858: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:859: trailing whitespace.
+[32m+[m[32m    Baut das DocumentDetails-Objekt für ein Korpusdokument. Echte[m[41m[m
+src/api/rest_service.py:860: trailing whitespace.
+[32m+[m[32m    JSON-Felder (seit der Erweiterung von transform_dtag_to_beir.py) haben[m[41m[m
+src/api/rest_service.py:861: trailing whitespace.
+[32m+[m[32m    Vorrang; ansonsten wird aus der Text-Präambel geparst (siehe[m[41m[m
+src/api/rest_service.py:862: trailing whitespace.
+[32m+[m[32m    parse_preamble, für ältere corpus.jsonl-Dateien). Liefert None, wenn[m[41m[m
+src/api/rest_service.py:863: trailing whitespace.
+[32m+[m[32m    gar nichts gefunden wurde.[m[41m[m
+src/api/rest_service.py:864: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:865: trailing whitespace.
+[32m+[m[32m    text = doc.get(FIELD_TEXT)[m[41m[m
+src/api/rest_service.py:866: trailing whitespace.
+[32m+[m[32m    preamble = parse_preamble(text)[m[41m[m
+src/api/rest_service.py:867: trailing whitespace.
+[32m+[m[32m    preamble_end = preamble.get("_preamble_end", 0)[m[41m[m
+src/api/rest_service.py:868: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:869: trailing whitespace.
+[32m+[m[32m    bereich = doc.get(FIELD_BEREICH)[m[41m[m
+src/api/rest_service.py:870: trailing whitespace.
+[32m+[m[32m    if bereich is None:[m[41m[m
+src/api/rest_service.py:871: trailing whitespace.
+[32m+[m[32m        aufgabenbereich = preamble.get("Aufgabenbereich")[m[41m[m
+src/api/rest_service.py:872: trailing whitespace.
+[32m+[m[32m        bereich = [b.strip() for b in aufgabenbereich.split(",") if b.strip()] if aufgabenbereich else None[m[41m[m
+src/api/rest_service.py:873: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:874: trailing whitespace.
+[32m+[m[32m    body_text = text[preamble_end:] if text else None[m[41m[m
+src/api/rest_service.py:875: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:876: trailing whitespace.
+[32m+[m[32m    details = DocumentDetails([m[41m[m
+src/api/rest_service.py:877: trailing whitespace.
+[32m+[m[32m        dienstverhaeltnis=doc.get(FIELD_DIENSTVERHAELTNIS),[m[41m[m
+src/api/rest_service.py:878: trailing whitespace.
+[32m+[m[32m        bereich=bereich,[m[41m[m
+src/api/rest_service.py:879: trailing whitespace.
+[32m+[m[32m        fachrichtung=doc.get("fachrichtung") or preamble.get("Fachrichtung"),[m[41m[m
+src/api/rest_service.py:880: trailing whitespace.
+[32m+[m[32m        beschaeftigungsart=doc.get(FIELD_BESCHAEFTIGUNGSART) or preamble.get("Beschäftigung"),[m[41m[m
+src/api/rest_service.py:881: trailing whitespace.
+[32m+[m[32m        beschaeftigungsdauer=doc.get(FIELD_BESCHAEFTIGUNGSDAUER),[m[41m[m
+src/api/rest_service.py:882: trailing whitespace.
+[32m+[m[32m        dienstort=doc.get(FIELD_DIENSTORT) or preamble.get("Einsatzort"),[m[41m[m
+src/api/rest_service.py:883: trailing whitespace.
+[32m+[m[32m        bundesland=doc.get(FIELD_BUNDESLAND),[m[41m[m
+src/api/rest_service.py:884: trailing whitespace.
+[32m+[m[32m        einsatzorte=_format_einsatzorte(doc.get(FIELD_EINSATZORTE)),[m[41m[m
+src/api/rest_service.py:885: trailing whitespace.
+[32m+[m[32m        dienststelle=doc.get(FIELD_DIENSTSTELLE) or preamble.get("Behörde"),[m[41m[m
+src/api/rest_service.py:886: trailing whitespace.
+[32m+[m[32m        url=doc.get(FIELD_URL),[m[41m[m
+src/api/rest_service.py:887: trailing whitespace.
+[32m+[m[32m        kennung=doc.get(FIELD_KENNUNG),[m[41m[m
+src/api/rest_service.py:888: trailing whitespace.
+[32m+[m[32m        veroeffentlicht_am=doc.get(FIELD_VEROEFFENTLICHT_AM),[m[41m[m
+src/api/rest_service.py:889: trailing whitespace.
+[32m+[m[32m        bewerbungsfrist=doc.get(FIELD_BEWERBUNGSFRIST),[m[41m[m
+src/api/rest_service.py:890: trailing whitespace.
+[32m+[m[32m        bewerbungsprozess=doc.get(FIELD_BEWERBUNGSPROZESS),[m[41m[m
+src/api/rest_service.py:891: trailing whitespace.
+[32m+[m[32m        anzahl_posten=doc.get(FIELD_ANZAHL_POSTEN),[m[41m[m
+src/api/rest_service.py:892: trailing whitespace.
+[32m+[m[32m        snippet=_make_snippet(body_text),[m[41m[m
+src/api/rest_service.py:893: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:894: trailing whitespace.
+[32m+[m[32m    if not any(v is not None for v in details.model_dump().values()):[m[41m[m
+src/api/rest_service.py:895: trailing whitespace.
+[32m+[m[32m        return None[m[41m[m
+src/api/rest_service.py:896: trailing whitespace.
+[32m+[m[32m    return details[m[41m[m
+src/api/rest_service.py:897: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:898: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:899: trailing whitespace.
+[32m+[m[32mdef build_result_item([m[41m[m
+src/api/rest_service.py:900: trailing whitespace.
+[32m+[m[32m    doc_id: str,[m[41m[m
+src/api/rest_service.py:901: trailing whitespace.
+[32m+[m[32m    score: float,[m[41m[m
+src/api/rest_service.py:902: trailing whitespace.
+[32m+[m[32m    corpus: dict,[m[41m[m
+src/api/rest_service.py:903: trailing whitespace.
+[32m+[m[32m    include_details: bool,[m[41m[m
+src/api/rest_service.py:904: trailing whitespace.
+[32m+[m[32m    distance_km: Optional[float] = None,[m[41m[m
+src/api/rest_service.py:905: trailing whitespace.
+[32m+[m[32m) -> SearchResultItem:[m[41m[m
+src/api/rest_service.py:906: trailing whitespace.
+[32m+[m[32m    doc = corpus.get(doc_id, {})[m[41m[m
+src/api/rest_service.py:907: trailing whitespace.
+[32m+[m[32m    return SearchResultItem([m[41m[m
+src/api/rest_service.py:908: trailing whitespace.
+[32m+[m[32m        doc_id=doc_id,[m[41m[m
+src/api/rest_service.py:909: trailing whitespace.
+[32m+[m[32m        title=doc.get("title"),[m[41m[m
+src/api/rest_service.py:910: trailing whitespace.
+[32m+[m[32m        score=float(score),[m[41m[m
+src/api/rest_service.py:911: trailing whitespace.
+[32m+[m[32m        distance_km=round(distance_km, 1) if distance_km is not None else None,[m[41m[m
+src/api/rest_service.py:912: trailing whitespace.
+[32m+[m[32m        details=build_document_details(doc) if include_details else None,[m[41m[m
+src/api/rest_service.py:913: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:914: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:915: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:916: trailing whitespace.
+[32m+[m[32m# FASTAPI APP[m[41m[m
+src/api/rest_service.py:917: trailing whitespace.
+[32m+[m[32m# =====================================================[m[41m[m
+src/api/rest_service.py:918: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:919: trailing whitespace.
+[32m+[m[32mapp = FastAPI([m[41m[m
+src/api/rest_service.py:920: trailing whitespace.
+[32m+[m[32m    title="Interamt Retrieval REST Service",[m[41m[m
+src/api/rest_service.py:921: trailing whitespace.
+[32m+[m[32m    description=([m[41m[m
+src/api/rest_service.py:922: trailing whitespace.
+[32m+[m[32m        "REST-API für die Suche in Interamt-Stellenausschreibungen. "[m[41m[m
+src/api/rest_service.py:923: trailing whitespace.
+[32m+[m[32m        "Die Beispiele im POST /search-Request können direkt über "[m[41m[m
+src/api/rest_service.py:924: trailing whitespace.
+[32m+[m[32m        "Swagger UI ausprobiert werden."[m[41m[m
+src/api/rest_service.py:925: trailing whitespace.
+[32m+[m[32m    ),[m[41m[m
+src/api/rest_service.py:926: trailing whitespace.
+[32m+[m[32m    version="1.0.0",[m[41m[m
+src/api/rest_service.py:927: trailing whitespace.
+[32m+[m[32m)[m[41m[m
+src/api/rest_service.py:928: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:929: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:930: trailing whitespace.
+[32m+[m[32m@app.middleware("http")[m[41m[m
+src/api/rest_service.py:931: trailing whitespace.
+[32m+[m[32masync def log_requests(request: Request, call_next):[m[41m[m
+src/api/rest_service.py:932: trailing whitespace.
+[32m+[m[32m    start = time.monotonic()[m[41m[m
+src/api/rest_service.py:933: trailing whitespace.
+[32m+[m[32m    try:[m[41m[m
+src/api/rest_service.py:934: trailing whitespace.
+[32m+[m[32m        response = await call_next(request)[m[41m[m
+src/api/rest_service.py:935: trailing whitespace.
+[32m+[m[32m    except Exception:[m[41m[m
+src/api/rest_service.py:936: trailing whitespace.
+[32m+[m[32m        logger.exception([m[41m[m
+src/api/rest_service.py:937: trailing whitespace.
+[32m+[m[32m            "REST %s %s fehlgeschlagen nach %.3fs",[m[41m[m
+src/api/rest_service.py:938: trailing whitespace.
+[32m+[m[32m            request.method,[m[41m[m
+src/api/rest_service.py:939: trailing whitespace.
+[32m+[m[32m            request.url.path,[m[41m[m
+src/api/rest_service.py:940: trailing whitespace.
+[32m+[m[32m            time.monotonic() - start,[m[41m[m
+src/api/rest_service.py:941: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:942: trailing whitespace.
+[32m+[m[32m        raise[m[41m[m
+src/api/rest_service.py:943: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:944: trailing whitespace.
+[32m+[m[32m    logger.info([m[41m[m
+src/api/rest_service.py:945: trailing whitespace.
+[32m+[m[32m        "REST %s %s -> %d in %.3fs",[m[41m[m
+src/api/rest_service.py:946: trailing whitespace.
+[32m+[m[32m        request.method,[m[41m[m
+src/api/rest_service.py:947: trailing whitespace.
+[32m+[m[32m        request.url.path,[m[41m[m
+src/api/rest_service.py:948: trailing whitespace.
+[32m+[m[32m        response.status_code,[m[41m[m
+src/api/rest_service.py:949: trailing whitespace.
+[32m+[m[32m        time.monotonic() - start,[m[41m[m
+src/api/rest_service.py:950: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:951: trailing whitespace.
+[32m+[m[32m    return response[m[41m[m
+src/api/rest_service.py:952: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:953: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:954: trailing whitespace.
+[32m+[m[32m@app.on_event("startup")[m[41m[m
+src/api/rest_service.py:955: trailing whitespace.
+[32m+[m[32mdef startup_event():[m[41m[m
+src/api/rest_service.py:956: trailing whitespace.
+[32m+[m[32m    global PC[m[41m[m
+src/api/rest_service.py:957: trailing whitespace.
+[32m+[m[32m    PC = build_pipeline_components()[m[41m[m
+src/api/rest_service.py:958: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:959: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:960: trailing whitespace.
+[32m+[m[32mdef make_scorer(base: str):[m[41m[m
+src/api/rest_service.py:961: trailing whitespace.
+[32m+[m[32m    if base == "bm25":[m[41m[m
+src/api/rest_service.py:962: trailing whitespace.
+[32m+[m[32m        return BM25Scorer(PC.bm25)[m[41m[m
+src/api/rest_service.py:963: trailing whitespace.
+[32m+[m[32m    if base == "dense":[m[41m[m
+src/api/rest_service.py:964: trailing whitespace.
+[32m+[m[32m        return DenseScorer(PC.dense)[m[41m[m
+src/api/rest_service.py:965: trailing whitespace.
+[32m+[m[32m    if base == "rrf":[m[41m[m
+src/api/rest_service.py:966: trailing whitespace.
+[32m+[m[32m        return RRFScorer(PC.bm25, PC.dense)[m[41m[m
+src/api/rest_service.py:967: trailing whitespace.
+[32m+[m[32m    if base == "alpha":[m[41m[m
+src/api/rest_service.py:968: trailing whitespace.
+[32m+[m[32m        return AlphaFusionScorer(PC.alpha_retriever)[m[41m[m
+src/api/rest_service.py:969: trailing whitespace.
+[32m+[m[32m    if base == "xgb":[m[41m[m
+src/api/rest_service.py:970: trailing whitespace.
+[32m+[m[32m        if PC.xgb_retriever is None:[m[41m[m
+src/api/rest_service.py:971: trailing whitespace.
+[32m+[m[32m            raise HTTPException([m[41m[m
+src/api/rest_service.py:972: trailing whitespace.
+[32m+[m[32m                status_code=400,[m[41m[m
+src/api/rest_service.py:973: trailing whitespace.
+[32m+[m[32m                detail="XGB-Retriever ist nicht geladen. Bitte zunächst ein trainiertes Modell bereitstellen.",[m[41m[m
+src/api/rest_service.py:974: trailing whitespace.
+[32m+[m[32m            )[m[41m[m
+src/api/rest_service.py:975: trailing whitespace.
+[32m+[m[32m        return XGBScorer(PC.xgb_retriever)[m[41m[m
+src/api/rest_service.py:976: trailing whitespace.
+[32m+[m[32m    raise HTTPException(status_code=400, detail=f"Unbekannte base: {base}")[m[41m[m
+src/api/rest_service.py:977: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:978: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:979: trailing whitespace.
+[32m+[m[32mdef _database_status() -> Dict[str, Any]:[m[41m[m
+src/api/rest_service.py:980: trailing whitespace.
+[32m+[m[32m    try:[m[41m[m
+src/api/rest_service.py:981: trailing whitespace.
+[32m+[m[32m        with psycopg.connect(EMBEDDING_DATABASE_URL, connect_timeout=2) as connection:[m[41m[m
+src/api/rest_service.py:982: trailing whitespace.
+[32m+[m[32m            connection.execute("SELECT 1")[m[41m[m
+src/api/rest_service.py:983: trailing whitespace.
+[32m+[m[32m        return {"status": "ok"}[m[41m[m
+src/api/rest_service.py:984: trailing whitespace.
+[32m+[m[32m    except Exception as error:[m[41m[m
+src/api/rest_service.py:985: trailing whitespace.
+[32m+[m[32m        logger.warning("Datenbank-Healthcheck fehlgeschlagen: %s", error)[m[41m[m
+src/api/rest_service.py:986: trailing whitespace.
+[32m+[m[32m        return {"status": "error", "error": str(error)}[m[41m[m
+src/api/rest_service.py:987: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:988: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:989: trailing whitespace.
+[32m+[m[32mdef _service_status() -> ServiceStatusResponse:[m[41m[m
+src/api/rest_service.py:990: trailing whitespace.
+[32m+[m[32m    components = {[m[41m[m
+src/api/rest_service.py:991: trailing whitespace.
+[32m+[m[32m        "bm25": PC.bm25 is not None,[m[41m[m
+src/api/rest_service.py:992: trailing whitespace.
+[32m+[m[32m        "dense": PC.dense is not None,[m[41m[m
+src/api/rest_service.py:993: trailing whitespace.
+[32m+[m[32m        "alpha": PC.alpha_retriever is not None,[m[41m[m
+src/api/rest_service.py:994: trailing whitespace.
+[32m+[m[32m        "xgb": PC.xgb_retriever is not None,[m[41m[m
+src/api/rest_service.py:995: trailing whitespace.
+[32m+[m[32m    }[m[41m[m
+src/api/rest_service.py:996: trailing whitespace.
+[32m+[m[32m    pipeline_ready = bool(PC.corpus) and all([m[41m[m
+src/api/rest_service.py:997: trailing whitespace.
+[32m+[m[32m        components[name] for name in ("bm25", "dense", "alpha")[m[41m[m
+src/api/rest_service.py:998: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:999: trailing whitespace.
+[32m+[m[32m    database = _database_status()[m[41m[m
+src/api/rest_service.py:1000: trailing whitespace.
+[32m+[m[32m    ready = pipeline_ready and database["status"] == "ok"[m[41m[m
+src/api/rest_service.py:1001: trailing whitespace.
+[32m+[m[32m    return ServiceStatusResponse([m[41m[m
+src/api/rest_service.py:1002: trailing whitespace.
+[32m+[m[32m        status="ok" if ready else "degraded",[m[41m[m
+src/api/rest_service.py:1003: trailing whitespace.
+[32m+[m[32m        pipeline_ready=pipeline_ready,[m[41m[m
+src/api/rest_service.py:1004: trailing whitespace.
+[32m+[m[32m        database=database,[m[41m[m
+src/api/rest_service.py:1005: trailing whitespace.
+[32m+[m[32m        num_documents=len(PC.corpus),[m[41m[m
+src/api/rest_service.py:1006: trailing whitespace.
+[32m+[m[32m        components=components,[m[41m[m
+src/api/rest_service.py:1007: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:1008: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1009: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1010: trailing whitespace.
+[32m+[m[32m@app.get("/health", response_model=ServiceStatusResponse)[m[41m[m
+src/api/rest_service.py:1011: trailing whitespace.
+[32m+[m[32mdef health():[m[41m[m
+src/api/rest_service.py:1012: trailing whitespace.
+[32m+[m[32m    status = _service_status()[m[41m[m
+src/api/rest_service.py:1013: trailing whitespace.
+[32m+[m[32m    if status.status != "ok":[m[41m[m
+src/api/rest_service.py:1014: trailing whitespace.
+[32m+[m[32m        raise HTTPException(status_code=503, detail=status.model_dump())[m[41m[m
+src/api/rest_service.py:1015: trailing whitespace.
+[32m+[m[32m    return status[m[41m[m
+src/api/rest_service.py:1016: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1017: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1018: trailing whitespace.
+[32m+[m[32m@app.get("/status", response_model=ServiceStatusResponse)[m[41m[m
+src/api/rest_service.py:1019: trailing whitespace.
+[32m+[m[32mdef service_status():[m[41m[m
+src/api/rest_service.py:1020: trailing whitespace.
+[32m+[m[32m    return _service_status()[m[41m[m
+src/api/rest_service.py:1021: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1022: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1023: trailing whitespace.
+[32m+[m[32m@app.post("/admin/reload", response_model=ReloadResponse)[m[41m[m
+src/api/rest_service.py:1024: trailing whitespace.
+[32m+[m[32mdef reload_pipeline():[m[41m[m
+src/api/rest_service.py:1025: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:1026: trailing whitespace.
+[32m+[m[32m    Liest corpus.jsonl neu ein und baut die komplette Pipeline neu auf.[m[41m[m
+src/api/rest_service.py:1027: trailing whitespace.
+[32m+[m[32m    DenseRetriever nutzt dabei intern seinen inkrementellen Cache, sodass[m[41m[m
+src/api/rest_service.py:1028: trailing whitespace.
+[32m+[m[32m    nur neue/geänderte Dokumente tatsächlich neu encodiert werden.[m[41m[m
+src/api/rest_service.py:1029: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1030: trailing whitespace.
+[32m+[m[32m    Läuft NICHT als Blocking-Operation innerhalb des globalen State: Die[m[41m[m
+src/api/rest_service.py:1031: trailing whitespace.
+[32m+[m[32m    neue Pipeline wird komplett separat aufgebaut. Erst nach erfolgreichem[m[41m[m
+src/api/rest_service.py:1032: trailing whitespace.
+[32m+[m[32m    Aufbau wird die globale Referenz PC atomar ausgetauscht, sodass[m[41m[m
+src/api/rest_service.py:1033: trailing whitespace.
+[32m+[m[32m    laufende /search-Requests währenddessen unbeeinträchtigt weiterlaufen.[m[41m[m
+src/api/rest_service.py:1034: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1035: trailing whitespace.
+[32m+[m[32m    Falls der Build fehlschlägt (z.B. defekte corpus.jsonl), bleibt der[m[41m[m
+src/api/rest_service.py:1036: trailing whitespace.
+[32m+[m[32m    bisherige PC unverändert erhalten und ein 500er wird zurückgegeben.[m[41m[m
+src/api/rest_service.py:1037: trailing whitespace.
+[32m+[m[32m    """[m[41m[m
+src/api/rest_service.py:1038: trailing whitespace.
+[32m+[m[32m    if READ_ONLY_WORKER:[m[41m[m
+src/api/rest_service.py:1039: trailing whitespace.
+[32m+[m[32m        raise HTTPException([m[41m[m
+src/api/rest_service.py:1040: trailing whitespace.
+[32m+[m[32m            status_code=403,[m[41m[m
+src/api/rest_service.py:1041: trailing whitespace.
+[32m+[m[32m            detail="Pipeline-Reload ist nur im Master-Modus erlaubt.",[m[41m[m
+src/api/rest_service.py:1042: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:1043: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1044: trailing whitespace.
+[32m+[m[32m    if not _reload_lock.acquire(blocking=False):[m[41m[m
+src/api/rest_service.py:1045: trailing whitespace.
+[32m+[m[32m        raise HTTPException([m[41m[m
+src/api/rest_service.py:1046: trailing whitespace.
+[32m+[m[32m            status_code=409,[m[41m[m
+src/api/rest_service.py:1047: trailing whitespace.
+[32m+[m[32m            detail="Ein Reload läuft bereits. Bitte warten, bis dieser abgeschlossen ist.",[m[41m[m
+src/api/rest_service.py:1048: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:1049: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1050: trailing whitespace.
+[32m+[m[32m    start = time.monotonic()[m[41m[m
+src/api/rest_service.py:1051: trailing whitespace.
+[32m+[m[32m    try:[m[41m[m
+src/api/rest_service.py:1052: trailing whitespace.
+[32m+[m[32m        try:[m[41m[m
+src/api/rest_service.py:1053: trailing whitespace.
+[32m+[m[32m            new_pc = build_pipeline_components()[m[41m[m
+src/api/rest_service.py:1054: trailing whitespace.
+[32m+[m[32m        except Exception as e:[m[41m[m
+src/api/rest_service.py:1055: trailing whitespace.
+[32m+[m[32m            logger.exception("Pipeline-Reload fehlgeschlagen, bisheriger Zustand bleibt aktiv.")[m[41m[m
+src/api/rest_service.py:1056: trailing whitespace.
+[32m+[m[32m            raise HTTPException(status_code=500, detail=f"Reload fehlgeschlagen: {e}")[m[41m[m
+src/api/rest_service.py:1057: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1058: trailing whitespace.
+[32m+[m[32m        global PC[m[41m[m
+src/api/rest_service.py:1059: trailing whitespace.
+[32m+[m[32m        PC = new_pc  # atomarer Referenz-Swap (GIL-geschützt)[m[41m[m
+src/api/rest_service.py:1060: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1061: trailing whitespace.
+[32m+[m[32m        duration = time.monotonic() - start[m[41m[m
+src/api/rest_service.py:1062: trailing whitespace.
+[32m+[m[32m        logger.info("Reload abgeschlossen in %.1fs (%d Dokumente).", duration, len(PC.corpus))[m[41m[m
+src/api/rest_service.py:1063: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1064: trailing whitespace.
+[32m+[m[32m        return ReloadResponse([m[41m[m
+src/api/rest_service.py:1065: trailing whitespace.
+[32m+[m[32m            status="reloaded",[m[41m[m
+src/api/rest_service.py:1066: trailing whitespace.
+[32m+[m[32m            num_documents=len(PC.corpus),[m[41m[m
+src/api/rest_service.py:1067: trailing whitespace.
+[32m+[m[32m            duration_seconds=round(duration, 2),[m[41m[m
+src/api/rest_service.py:1068: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:1069: trailing whitespace.
+[32m+[m[32m    finally:[m[41m[m
+src/api/rest_service.py:1070: trailing whitespace.
+[32m+[m[32m        _reload_lock.release()[m[41m[m
+src/api/rest_service.py:1071: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1072: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1073: trailing whitespace.
+[32m+[m[32mdef _require_eval_data():[m[41m[m
+src/api/rest_service.py:1074: trailing whitespace.
+[32m+[m[32m    if not PC.queries or not PC.qrels:[m[41m[m
+src/api/rest_service.py:1075: trailing whitespace.
+[32m+[m[32m        raise HTTPException([m[41m[m
+src/api/rest_service.py:1076: trailing whitespace.
+[32m+[m[32m            status_code=503,[m[41m[m
+src/api/rest_service.py:1077: trailing whitespace.
+[32m+[m[32m            detail=([m[41m[m
+src/api/rest_service.py:1078: trailing whitespace.
+[32m+[m[32m                f"Keine Evaluationsdaten geladen (erwartet unter "[m[41m[m
+src/api/rest_service.py:1079: trailing whitespace.
+[32m+[m[32m                f"{QUERIES_PATH} und {QRELS_PATH}). /evaluate ist erst "[m[41m[m
+src/api/rest_service.py:1080: trailing whitespace.
+[32m+[m[32m                f"nutzbar, wenn beide Dateien vorhanden sind und die "[m[41m[m
+src/api/rest_service.py:1081: trailing whitespace.
+[32m+[m[32m                f"Pipeline (neu) geladen wurde."[m[41m[m
+src/api/rest_service.py:1082: trailing whitespace.
+[32m+[m[32m            ),[m[41m[m
+src/api/rest_service.py:1083: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:1084: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1085: trailing whitespace.
+[32m+[m[32m@app.post([m[41m[m
+src/api/rest_service.py:1086: trailing whitespace.
+[32m+[m[32m    "/search",[m[41m[m
+src/api/rest_service.py:1087: trailing whitespace.
+[32m+[m[32m    response_model=SearchResponse,[m[41m[m
+src/api/rest_service.py:1088: trailing whitespace.
+[32m+[m[32m    summary="Stellenausschreibungen suchen",[m[41m[m
+src/api/rest_service.py:1089: trailing whitespace.
+[32m+[m[32m    description=([m[41m[m
+src/api/rest_service.py:1090: trailing whitespace.
+[32m+[m[32m        "Führt eine Suche mit BM25, Dense Retrieval oder einer Fusion aus. "[m[41m[m
+src/api/rest_service.py:1091: trailing whitespace.
+[32m+[m[32m        "Im Request-Body stehen mehrere direkt ausführbare Beispiele zur Verfügung."[m[41m[m
+src/api/rest_service.py:1092: trailing whitespace.
+[32m+[m[32m    ),[m[41m[m
+src/api/rest_service.py:1093: trailing whitespace.
+[32m+[m[32m)[m[41m[m
+src/api/rest_service.py:1094: trailing whitespace.
+[32m+[m[32mdef search([m[41m[m
+src/api/rest_service.py:1095: trailing whitespace.
+[32m+[m[32m    req: SearchRequest = Body([m[41m[m
+src/api/rest_service.py:1096: trailing whitespace.
+[32m+[m[32m        ...,[m[41m[m
+src/api/rest_service.py:1097: trailing whitespace.
+[32m+[m[32m        openapi_examples={[m[41m[m
+src/api/rest_service.py:1098: trailing whitespace.
+[32m+[m[32m            "einfache Suche": {[m[41m[m
+src/api/rest_service.py:1099: trailing whitespace.
+[32m+[m[32m                "summary": "Einfache BM25-Suche",[m[41m[m
+src/api/rest_service.py:1100: trailing whitespace.
+[32m+[m[32m                "description": "Sucht nach IT-Sicherheitsstellen und liefert die zehn relevantesten Treffer.",[m[41m[m
+src/api/rest_service.py:1101: trailing whitespace.
+[32m+[m[32m                "value": {[m[41m[m
+src/api/rest_service.py:1102: trailing whitespace.
+[32m+[m[32m                    "query": "Sachbearbeiter IT-Sicherheit",[m[41m[m
+src/api/rest_service.py:1103: trailing whitespace.
+[32m+[m[32m                    "top_k": 10,[m[41m[m
+src/api/rest_service.py:1104: trailing whitespace.
+[32m+[m[32m                    "base": "bm25",[m[41m[m
+src/api/rest_service.py:1105: trailing whitespace.
+[32m+[m[32m                    "use_qe": False,[m[41m[m
+src/api/rest_service.py:1106: trailing whitespace.
+[32m+[m[32m                    "use_kg": False,[m[41m[m
+src/api/rest_service.py:1107: trailing whitespace.
+[32m+[m[32m                    "use_ce": False,[m[41m[m
+src/api/rest_service.py:1108: trailing whitespace.
+[32m+[m[32m                },[m[41m[m
+src/api/rest_service.py:1109: trailing whitespace.
+[32m+[m[32m            },[m[41m[m
+src/api/rest_service.py:1110: trailing whitespace.
+[32m+[m[32m            "Suche mit Filtern": {[m[41m[m
+src/api/rest_service.py:1111: trailing whitespace.
+[32m+[m[32m                "summary": "Suche mit Ort und Beschäftigungsart",[m[41m[m
+src/api/rest_service.py:1112: trailing whitespace.
+[32m+[m[32m                "description": "Beschränkt die Suche auf Vollzeitstellen im Umkreis von 50 km um Rostock.",[m[41m[m
+src/api/rest_service.py:1113: trailing whitespace.
+[32m+[m[32m                "value": {[m[41m[m
+src/api/rest_service.py:1114: trailing whitespace.
+[32m+[m[32m                    "query": "Verwaltung Sachbearbeitung",[m[41m[m
+src/api/rest_service.py:1115: trailing whitespace.
+[32m+[m[32m                    "top_k": 10,[m[41m[m
+src/api/rest_service.py:1116: trailing whitespace.
+[32m+[m[32m                    "candidate_k": 50,[m[41m[m
+src/api/rest_service.py:1117: trailing whitespace.
+[32m+[m[32m                    "base": "rrf",[m[41m[m
+src/api/rest_service.py:1118: trailing whitespace.
+[32m+[m[32m                    "use_qe": True,[m[41m[m
+src/api/rest_service.py:1119: trailing whitespace.
+[32m+[m[32m                    "use_ce": True,[m[41m[m
+src/api/rest_service.py:1120: trailing whitespace.
+[32m+[m[32m                    "filters": {[m[41m[m
+src/api/rest_service.py:1121: trailing whitespace.
+[32m+[m[32m                        "plz_oder_ort": "18055",[m[41m[m
+src/api/rest_service.py:1122: trailing whitespace.
+[32m+[m[32m                        "max_distance_km": 50,[m[41m[m
+src/api/rest_service.py:1123: trailing whitespace.
+[32m+[m[32m                        "beschaeftigungsart": "Vollzeit",[m[41m[m
+src/api/rest_service.py:1124: trailing whitespace.
+[32m+[m[32m                        "dienstverhaeltnis": ["Beamter", "Angestellter"],[m[41m[m
+src/api/rest_service.py:1125: trailing whitespace.
+[32m+[m[32m                    },[m[41m[m
+src/api/rest_service.py:1126: trailing whitespace.
+[32m+[m[32m                    "sort_by": "distance",[m[41m[m
+src/api/rest_service.py:1127: trailing whitespace.
+[32m+[m[32m                },[m[41m[m
+src/api/rest_service.py:1128: trailing whitespace.
+[32m+[m[32m            },[m[41m[m
+src/api/rest_service.py:1129: trailing whitespace.
+[32m+[m[32m            "Dense-Suche": {[m[41m[m
+src/api/rest_service.py:1130: trailing whitespace.
+[32m+[m[32m                "summary": "Semantische Dense-Suche",[m[41m[m
+src/api/rest_service.py:1131: trailing whitespace.
+[32m+[m[32m                "description": "Verwendet den Dense-Retriever für eine semantische Suche ohne exakte Stichwortübereinstimmung.",[m[41m[m
+src/api/rest_service.py:1132: trailing whitespace.
+[32m+[m[32m                "value": {[m[41m[m
+src/api/rest_service.py:1133: trailing whitespace.
+[32m+[m[32m                    "query": "Beratung von Bürgerinnen und Bürgern zu Sozialleistungen",[m[41m[m
+src/api/rest_service.py:1134: trailing whitespace.
+[32m+[m[32m                    "top_k": 5,[m[41m[m
+src/api/rest_service.py:1135: trailing whitespace.
+[32m+[m[32m                    "candidate_k": 50,[m[41m[m
+src/api/rest_service.py:1136: trailing whitespace.
+[32m+[m[32m                    "base": "dense",[m[41m[m
+src/api/rest_service.py:1137: trailing whitespace.
+[32m+[m[32m                    "normalize_scores": True,[m[41m[m
+src/api/rest_service.py:1138: trailing whitespace.
+[32m+[m[32m                },[m[41m[m
+src/api/rest_service.py:1139: trailing whitespace.
+[32m+[m[32m            },[m[41m[m
+src/api/rest_service.py:1140: trailing whitespace.
+[32m+[m[32m        },[m[41m[m
+src/api/rest_service.py:1141: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:1142: trailing whitespace.
+[32m+[m[32m):[m[41m[m
+src/api/rest_service.py:1143: trailing whitespace.
+[32m+[m[32m    if not PC.corpus:[m[41m[m
+src/api/rest_service.py:1144: trailing whitespace.
+[32m+[m[32m        raise HTTPException(status_code=503, detail="Service noch nicht vollständig initialisiert.")[m[41m[m
+src/api/rest_service.py:1145: trailing whitespace.
+[32m+[m[32m    if req.use_kg:[m[41m[m
+src/api/rest_service.py:1146: trailing whitespace.
+[32m+[m[32m        raise HTTPException([m[41m[m
+src/api/rest_service.py:1147: trailing whitespace.
+[32m+[m[32m            status_code=410,[m[41m[m
+src/api/rest_service.py:1148: trailing whitespace.
+[32m+[m[32m            detail="Knowledge-Graph-Reranking ist in der Produktivkonfiguration deaktiviert.",[m[41m[m
+src/api/rest_service.py:1149: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:1150: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1151: trailing whitespace.
+[32m+[m[32m    # --- Referenzpunkt für Distanz (unabhängig von max_distance_km, da auch[m[41m[m
+src/api/rest_service.py:1152: trailing whitespace.
+[32m+[m[32m    #     sort_by='distance' ohne Radius-Filter funktionieren soll) ---[m[41m[m
+src/api/rest_service.py:1153: trailing whitespace.
+[32m+[m[32m    ref_latlon = None[m[41m[m
+src/api/rest_service.py:1154: trailing whitespace.
+[32m+[m[32m    if req.filters and req.filters.plz_oder_ort:[m[41m[m
+src/api/rest_service.py:1155: trailing whitespace.
+[32m+[m[32m        ref_latlon = resolve_to_latlon(req.filters.plz_oder_ort)[m[41m[m
+src/api/rest_service.py:1156: trailing whitespace.
+[32m+[m[32m        if ref_latlon is None:[m[41m[m
+src/api/rest_service.py:1157: trailing whitespace.
+[32m+[m[32m            logger.warning("PLZ/Ort '%s' konnte nicht aufgelöst werden.", req.filters.plz_oder_ort)[m[41m[m
+src/api/rest_service.py:1158: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1159: trailing whitespace.
+[32m+[m[32m    if req.sort_by == "distance" and ref_latlon is None:[m[41m[m
+src/api/rest_service.py:1160: trailing whitespace.
+[32m+[m[32m        raise HTTPException([m[41m[m
+src/api/rest_service.py:1161: trailing whitespace.
+[32m+[m[32m            status_code=400,[m[41m[m
+src/api/rest_service.py:1162: trailing whitespace.
+[32m+[m[32m            detail="sort_by='distance' erfordert einen auflösbaren filters.plz_oder_ort.",[m[41m[m
+src/api/rest_service.py:1163: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:1164: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1165: trailing whitespace.
+[32m+[m[32m    distances_km: Dict[str, float] = {}[m[41m[m
+src/api/rest_service.py:1166: trailing whitespace.
+[32m+[m[32m    if ref_latlon is not None:[m[41m[m
+src/api/rest_service.py:1167: trailing whitespace.
+[32m+[m[32m        distances_km = _compute_min_distances_km([m[41m[m
+src/api/rest_service.py:1168: trailing whitespace.
+[32m+[m[32m            ref_latlon[0], ref_latlon[1], PC.doc_lats, PC.doc_lons, PC.doc_ids_with_geo[m[41m[m
+src/api/rest_service.py:1169: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:1170: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1171: trailing whitespace.
+[32m+[m[32m    query_for_retrieval = req.query[m[41m[m
+src/api/rest_service.py:1172: trailing whitespace.
+[32m+[m[32m    preprocessing_applied: List[QueryPreprocessingStep] = [][m[41m[m
+src/api/rest_service.py:1173: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1174: trailing whitespace.
+[32m+[m[32m    # --- Rechtschreibkorrektur (vor Filterung und Retrieval) ---[m[41m[m
+src/api/rest_service.py:1175: trailing whitespace.
+[32m+[m[32m    if req.correct_spelling and PC.spell_corrector is not None:[m[41m[m
+src/api/rest_service.py:1176: trailing whitespace.
+[32m+[m[32m        corrected_query, spelling_corrected = PC.spell_corrector.correct(req.query)[m[41m[m
+src/api/rest_service.py:1177: trailing whitespace.
+[32m+[m[32m        if spelling_corrected:[m[41m[m
+src/api/rest_service.py:1178: trailing whitespace.
+[32m+[m[32m            logger.info("Rechtschreibkorrektur: '%s' -> '%s'", req.query, corrected_query)[m[41m[m
+src/api/rest_service.py:1179: trailing whitespace.
+[32m+[m[32m            query_for_retrieval = corrected_query[m[41m[m
+src/api/rest_service.py:1180: trailing whitespace.
+[32m+[m[32m            preprocessing_applied.append([m[41m[m
+src/api/rest_service.py:1181: trailing whitespace.
+[32m+[m[32m                QueryPreprocessingStep(step="spelling_correction", result=corrected_query)[m[41m[m
+src/api/rest_service.py:1182: trailing whitespace.
+[32m+[m[32m            )[m[41m[m
+src/api/rest_service.py:1183: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1184: trailing whitespace.
+[32m+[m[32m    # --- Abkürzungserkennung (nach Rechtschreibkorrektur, vor Retrieval) ---[m[41m[m
+src/api/rest_service.py:1185: trailing whitespace.
+[32m+[m[32m    if req.expand_abbreviations and PC.abbreviation_expander is not None:[m[41m[m
+src/api/rest_service.py:1186: trailing whitespace.
+[32m+[m[32m        expanded, abbreviations_expanded = PC.abbreviation_expander.expand(query_for_retrieval)[m[41m[m
+src/api/rest_service.py:1187: trailing whitespace.
+[32m+[m[32m        if abbreviations_expanded:[m[41m[m
+src/api/rest_service.py:1188: trailing whitespace.
+[32m+[m[32m            logger.info("Abkürzungen erkannt: '%s' -> '%s'", query_for_retrieval, expanded)[m[41m[m
+src/api/rest_service.py:1189: trailing whitespace.
+[32m+[m[32m            query_for_retrieval = expanded[m[41m[m
+src/api/rest_service.py:1190: trailing whitespace.
+[32m+[m[32m            preprocessing_applied.append([m[41m[m
+src/api/rest_service.py:1191: trailing whitespace.
+[32m+[m[32m                QueryPreprocessingStep(step="abbreviation_expansion", result=expanded)[m[41m[m
+src/api/rest_service.py:1192: trailing whitespace.
+[32m+[m[32m            )[m[41m[m
+src/api/rest_service.py:1193: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1194: trailing whitespace.
+[32m+[m[32m    # --- Behördensprache/Amtsdeutsch-Synonyme (nach Abkürzungen, vor Schreibvarianten) ---[m[41m[m
+src/api/rest_service.py:1195: trailing whitespace.
+[32m+[m[32m    if req.normalize_behoerdensprache and PC.behoerden_normalizer is not None:[m[41m[m
+src/api/rest_service.py:1196: trailing whitespace.
+[32m+[m[32m        behoerden_expanded, behoerdensprache_expanded = PC.behoerden_normalizer.expand_query(query_for_retrieval)[m[41m[m
+src/api/rest_service.py:1197: trailing whitespace.
+[32m+[m[32m        if behoerdensprache_expanded:[m[41m[m
+src/api/rest_service.py:1198: trailing whitespace.
+[32m+[m[32m            logger.info("Behördensprache erweitert: '%s' -> '%s'", query_for_retrieval, behoerden_expanded)[m[41m[m
+src/api/rest_service.py:1199: trailing whitespace.
+[32m+[m[32m            query_for_retrieval = behoerden_expanded[m[41m[m
+src/api/rest_service.py:1200: trailing whitespace.
+[32m+[m[32m            preprocessing_applied.append([m[41m[m
+src/api/rest_service.py:1201: trailing whitespace.
+[32m+[m[32m                QueryPreprocessingStep(step="behoerdensprache_expansion", result=behoerden_expanded)[m[41m[m
+src/api/rest_service.py:1202: trailing whitespace.
+[32m+[m[32m            )[m[41m[m
+src/api/rest_service.py:1203: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1204: trailing whitespace.
+[32m+[m[32m    # --- Schreibvarianten-Normalisierung (nach Abkürzungen, vor Retrieval) ---[m[41m[m
+src/api/rest_service.py:1205: trailing whitespace.
+[32m+[m[32m    if req.normalize_spelling_variants and PC.variant_normalizer is not None:[m[41m[m
+src/api/rest_service.py:1206: trailing whitespace.
+[32m+[m[32m        normalized, variants_normalized = PC.variant_normalizer.expand_query(query_for_retrieval)[m[41m[m
+src/api/rest_service.py:1207: trailing whitespace.
+[32m+[m[32m        if variants_normalized:[m[41m[m
+src/api/rest_service.py:1208: trailing whitespace.
+[32m+[m[32m            logger.info("Schreibvarianten normalisiert: '%s' -> '%s'", query_for_retrieval, normalized)[m[41m[m
+src/api/rest_service.py:1209: trailing whitespace.
+[32m+[m[32m            query_for_retrieval = normalized[m[41m[m
+src/api/rest_service.py:1210: trailing whitespace.
+[32m+[m[32m            preprocessing_applied.append([m[41m[m
+src/api/rest_service.py:1211: trailing whitespace.
+[32m+[m[32m                QueryPreprocessingStep(step="spelling_variant_normalization", result=normalized)[m[41m[m
+src/api/rest_service.py:1212: trailing whitespace.
+[32m+[m[32m            )[m[41m[m
+src/api/rest_service.py:1213: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1214: trailing whitespace.
+[32m+[m[32m    if req.split_compounds and PC.compound_splitter is not None:[m[41m[m
+src/api/rest_service.py:1215: trailing whitespace.
+[32m+[m[32m        split_result, compounds_split = PC.compound_splitter.expand_query(query_for_retrieval)[m[41m[m
+src/api/rest_service.py:1216: trailing whitespace.
+[32m+[m[32m        if compounds_split:[m[41m[m
+src/api/rest_service.py:1217: trailing whitespace.
+[32m+[m[32m            query_for_retrieval = split_result[m[41m[m
+src/api/rest_service.py:1218: trailing whitespace.
+[32m+[m[32m            preprocessing_applied.append([m[41m[m
+src/api/rest_service.py:1219: trailing whitespace.
+[32m+[m[32m                QueryPreprocessingStep(step="compound_splitting", result=split_result)[m[41m[m
+src/api/rest_service.py:1220: trailing whitespace.
+[32m+[m[32m            )[m[41m[m
+src/api/rest_service.py:1221: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1222: trailing whitespace.
+[32m+[m[32m    # --- Pre-Filter (PLZ/Ort, Dienstverhältnis, Bereich, ...) ---[m[41m[m
+src/api/rest_service.py:1223: trailing whitespace.
+[32m+[m[32m    allowed_ids = get_allowed_doc_ids([m[41m[m
+src/api/rest_service.py:1224: trailing whitespace.
+[32m+[m[32m        PC.corpus, req.filters, PC.doc_lats, PC.doc_lons, PC.doc_ids_with_geo[m[41m[m
+src/api/rest_service.py:1225: trailing whitespace.
+[32m+[m[32m    )[m[41m[m
+src/api/rest_service.py:1226: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1227: trailing whitespace.
+[32m+[m[32m    if allowed_ids is not None and len(allowed_ids) == 0:[m[41m[m
+src/api/rest_service.py:1228: trailing whitespace.
+[32m+[m[32m        # Filter hat alles herausgefiltert -> leeres Ergebnis, kein Fehler[m[41m[m
+src/api/rest_service.py:1229: trailing whitespace.
+[32m+[m[32m        return SearchResponse([m[41m[m
+src/api/rest_service.py:1230: trailing whitespace.
+[32m+[m[32m            query=req.query,[m[41m[m
+src/api/rest_service.py:1231: trailing whitespace.
+[32m+[m[32m            base=req.base,[m[41m[m
+src/api/rest_service.py:1232: trailing whitespace.
+[32m+[m[32m            num_candidates_after_filter=0,[m[41m[m
+src/api/rest_service.py:1233: trailing whitespace.
+[32m+[m[32m            results=[],[m[41m[m
+src/api/rest_service.py:1234: trailing whitespace.
+[32m+[m[32m            final_query=query_for_retrieval,[m[41m[m
+src/api/rest_service.py:1235: trailing whitespace.
+[32m+[m[32m            preprocessing_applied=preprocessing_applied,[m[41m[m
+src/api/rest_service.py:1236: trailing whitespace.
+[32m+[m[32m        )[m[41m[m
+src/api/rest_service.py:1237: trailing whitespace.
+[32m+[m[41m[m
+src/api/rest_service.py:1238: trailing whitespace.
+[32m+[m[32m    # --- Pipeline zusammenbauen (BM25 / Dense / RRF / Alpha / XGB + Modifier) ---[m[41m[m
+src/api/rest_service.py:1239: trailing whitespace.
+[32m+[m[32m    pipeline = ComponentPipeline([m[41m[m
+src/api/rest_service.py:1240: trailing whitespace.
+[32m+[m[32m        scorer=make_scorer(req.base),[m[41m[m
+src/api/rest_service.py:1241: trailing whitespace.
+[32m+[m[32m        corpus=PC.corpus,[m[41m[m
+src/api/rest_service.py:1242: trailing whitespace.
+[32m+[m[32m        query_expander=PC.query_expander if req.use_qe else None,[m[41m[m
+src/api/re

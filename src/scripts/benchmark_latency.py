@@ -437,7 +437,12 @@ def parse_args():
         default=",".join(SCENARIOS),
         help=f"Kommagetrennt, verfügbar: {', '.join(SCENARIOS)}",
     )
-    p.add_argument("--device", default=None, help="cuda / cpu (Default: automatisch)")
+    p.add_argument(
+        "--device",
+        choices=["cuda", "cpu"],
+        default=None,
+        help="cuda / cpu (Default: automatisch). 'cpu' erzwingt CPU für alle Modelle inkl. Cross-Encoder.",
+    )
     p.add_argument("--embedding-cache", default=".cache/benchmark/dense_embeddings_bge-m3.npz")
     p.add_argument("--skip-ce", action="store_true", help="Cross-Encoder nicht laden, CE-Szenarien überspringen")
     p.add_argument(
@@ -456,6 +461,12 @@ def main():
     unknown = [s for s in requested if s not in SCENARIOS]
     if unknown:
         raise SystemExit(f"Unbekannte Szenarien: {unknown}")
+
+    if args.device == "cpu":
+        # CrossEncoderReranker und DenseRetriever wählen ihr Gerät über
+        # torch.cuda.is_available(). CUDA_VISIBLE_DEVICES="" reicht unter Windows
+        # nicht zuverlässig (is_available() bleibt True), daher hier hart abschalten.
+        torch.cuda.is_available = lambda: False
 
     startup: dict[str, float] = {}
     t_start = time.perf_counter()
@@ -491,7 +502,8 @@ def main():
         "cpu": platform.processor(),
         "torch": torch.__version__,
         "device": pc.dense.device,
-        "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+        "gpu": torch.cuda.get_device_name(0) if pc.dense.device == "cuda" else None,
+        "cpu_threads": torch.get_num_threads(),
         "corpus_docs": len(pc.corpus),
         "n_queries": len(queries),
         "warmup": args.warmup,

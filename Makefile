@@ -269,6 +269,10 @@ benchmark:
 		--n-queries $(N_QUERIES) \
 		$(if $(SCENARIOS),--scenarios $(SCENARIOS),)
 
+# PDF-Bericht aus einem Lauf: make benchmark-report RUN=results/benchmark/20261118_164249
+benchmark-report:
+	$(PYTHON) -m src.scripts.benchmark_report $(RUN)
+
 # =====================================================
 # CLEAN
 # =====================================================

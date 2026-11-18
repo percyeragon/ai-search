@@ -40,6 +40,7 @@ tqdm>=4.66
 # =========================
 matplotlib>=3.8
 seaborn>=0.13
+reportlab>=4.0   # PDF-Bericht für den Laufzeittest
 
 # =========================
 # UTILITIES
